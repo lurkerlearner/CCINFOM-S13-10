@@ -11,12 +11,11 @@ public class Meal {
     private String nutrients;
     private String date_added;
     private int diet_preference_id;
-    private int ingredient_id;
 
 
 
 public Meal(int meal_id, String meal_name, float price, float cost, int preparation_time,
-                  int calories, String nutrients, String date_added, int diet_preference_id, int ingredient_id){
+                  int calories, String nutrients, String date_added, int diet_preference_id){
 
     this.meal_id = meal_id;
     this.meal_name = meal_name;
@@ -27,7 +26,6 @@ public Meal(int meal_id, String meal_name, float price, float cost, int preparat
     this.nutrients = nutrients;
     this.date_added = date_added;
     this.diet_preference_id = diet_preference_id;
-    this.ingredient_id = ingredient_id;
 }
 public int getMeal_id(){
     return meal_id;
@@ -65,7 +63,5 @@ public int getMeal_id(){
         return diet_preference_id;
     }
 
-    public int getIngredient_id() {
-        return ingredient_id;
-    }
 }
+
