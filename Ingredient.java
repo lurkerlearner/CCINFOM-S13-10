@@ -4,20 +4,16 @@ public class Ingredient {
     private int ingredient_id;
     private int batch_no;
     private String ingredient_name;
-    private String category;
-    private String storage_type;
-    private String measurement_unit; 
-    // private String[] category = {"Protein", "Dairy", "Grains", "Fat","Condiments"};
-    // private String[] storage_type = {"Dry", "Refrigerated", "Frozen"};
-    // private String[] measurement_unit = {"grams", "litres"};
+    private Category category;
+    private Storage_type storage_type;
+    private Measurement_unit measurement_unit; 
     private double stock_quantity;
     private Date expiry_date;
-    private String restock_status; 
-    // private String[] restock_status = {"Available", "Low Stock", "Out of Stock"};
+    private Restock_status restock_status; 
 
     public Ingredient(int ingredient_id, int batch_no, String ingredient_name, 
-                        String category, String storage_type, String measurement_unit,
-                        double stock_quantity, Date expiry_date, String restock_status) 
+                        Category category, Storage_type storage_type, Measurement_unit measurement_unit,
+                        double stock_quantity, Date expiry_date, Restock_status restock_status) 
     {
         this.ingredient_id = ingredient_id;
         this.batch_no = batch_no;
@@ -42,15 +38,15 @@ public class Ingredient {
         return ingredient_name;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public String getStorage_type() {
+    public Storage_type getStorage_type() {
         return storage_type;
     }
 
-    public String getMeasurement_unit() {
+    public Measurement_unit getMeasurement_unit() {
         return measurement_unit;
     }
 
@@ -61,7 +57,7 @@ public class Ingredient {
     public Date getExpiry_date() {
         return expiry_date;
     }
-    public String getRestock_status() {
+    public Restock_status getRestock_status() {
         return restock_status;
     }
 
@@ -77,15 +73,15 @@ public class Ingredient {
         this.ingredient_name = ingredient_name;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 
-    public void setStorage_type(String storage_type) {
+    public void setStorage_type(Storage_type storage_type) {
         this.storage_type = storage_type;
     }
 
-    public void setMeasurement_unit(String measurement_unit) {
+    public void setMeasurement_unit(Measurement_unit measurement_unit) {
         this.measurement_unit = measurement_unit;
     }
 
@@ -96,7 +92,7 @@ public class Ingredient {
     public void setExpiry_date(Date expiry_date) {
         this.expiry_date = expiry_date;
     }
-    public void setRestock_status(String restock_status) {
+    public void setRestock_status(Restock_status restock_status) {
         this.restock_status = restock_status;
     }
     
