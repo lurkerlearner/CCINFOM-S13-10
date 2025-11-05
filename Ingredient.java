@@ -58,7 +58,7 @@ public class Ingredient {
         return stock_quantity;
     }
 
-    public String getExpiry_date() {
+    public Date getExpiry_date() {
         return expiry_date;
     }
     public String getRestock_status() {
