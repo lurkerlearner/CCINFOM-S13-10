@@ -1,11 +1,14 @@
+import java.sql.Date;
+import java.sql.Time;
+
 public class Delivery 
 {
     private int transaction_id;
     private int client_id;
     private int meal_id;
-    private String order_date;
-    private String time_ordered;
-    private String time_delivered;
+    private Date order_date;
+    private Time time_ordered;
+    private Time time_delivered;
     private String payment_mode;
     private String payment_status;
     private int rider_id;
@@ -13,7 +16,7 @@ public class Delivery
     private String delivery_method;
 
     public Delivery(int transaction_id, int client_id, int meal_id,
-                    String order_date, String time_ordered, String time_delivered,
+                    Date order_date, Time time_ordered, Time time_delivered,
                     int rider_id, String payment_mode, String payment_status,
                     String delivery_status, String delivery_method)
                     {
@@ -45,17 +48,17 @@ public class Delivery
         return meal_id;
     }
 
-    public String getOrderDate()
+    public Date getOrderDate()
     {
         return order_date;
     }
 
-    public String getTimeOrdered()
+    public Time getTimeOrdered()
     {
         return time_ordered;
     }
 
-    public String getTimeDelivered()
+    public Time getTimeDelivered()
     {
         return time_delivered;
     }
@@ -100,17 +103,17 @@ public class Delivery
         this.meal_id = meal_id;
     }
 
-    public void setOrderDate(String order_date)
+    public void setOrderDate(Date order_date)
     {
         this.order_date = order_date;
     }
 
-    public void setTimeOrdered(String time_ordered)
+    public void setTimeOrdered(Time time_ordered)
     {
         this.time_ordered = time_ordered;
     }
 
-    public void setTimeDelivered(String time_delivered)
+    public void setTimeDelivered(Time time_delivered)
     {
         this.time_delivered = time_delivered;
     }
