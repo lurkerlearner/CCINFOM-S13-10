@@ -5,9 +5,9 @@ public class Rider
     private int rider_id;
     private String rider_name;
     private Date hire_date;
-    private int contact_no;
+    private String contact_no;
 
-    public Rider(int rider_id, String rider_name, Date hire_date, int contact_no)
+    public Rider(int rider_id, String rider_name, Date hire_date, String contact_no)
                 {
                     this.rider_id = rider_id;
                     this.rider_name = rider_name;
@@ -32,7 +32,7 @@ public class Rider
         return hire_date;
     }
 
-    public int getContactNo()
+    public String getContactNo()
     {
         return contact_no;
     }
@@ -52,7 +52,7 @@ public class Rider
         this.hire_date = hire_date;
     }
 
-    public void setContactNo(int contact_no)
+    public void setContactNo(String contact_no)
     {
         this.contact_no = contact_no;
     }
