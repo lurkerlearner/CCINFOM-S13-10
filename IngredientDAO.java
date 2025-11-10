@@ -1,42 +1,126 @@
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 public class IngredientDAO {
 
-    /* public boolean addIngredient(Ingredient ingredient) {
-        // String sqlQuery = 
-    } */
+    public boolean addIngredient(Ingredient ingredient) {
+        Restock_status restock_status = Restock_status.calculateStatus(ingredient.getStock_quantity());
+        String sqlQuery = "INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, " +
+        "measurement_unit, stock_quantity, expiry_date, restock_status) + VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public ArrayList<String> getIngredientsByBatchNo(int batch_no) {
-        ArrayList<String> ingredients = new ArrayList<>();
-        String sqlQuery = "SELECT ingredient_name FROM INGREDIENT WHERE batch_no = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlQuery);
-             ResultSet rs = stmt.executeQuery()) {
+        // RETURN_GENERATED_KEYS to get the auto generated ingredient_id from the database
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS)) 
+        {
+            stmt.setInt(1, ingredient.getBatch_no());
+            stmt.setString(2, ingredient.getIngredient_name());
+            stmt.setString(3, ingredient.getCategory().name());
+            stmt.setString(4, ingredient.getStorage_type().name());
+            stmt.setString(5, ingredient.getMeasurement_unit().name());
+            stmt.setDouble(6, ingredient.getStock_quantity());
+            stmt.setDate(7, ingredient.getExpiry_date());
+            stmt.setString(8, ingredient.getRestock_status().name());
+            stmt.setInt(9, ingredient.getSupplier_id()); // ensure that supplier table already has records
 
-            // go thru each row and add it to the arraylist    
-            while (rs.next()) {
-                ingredients.add(rs.getString("ingredient_name"));
+            int affectedRows = stmt.executeUpdate();
+        
+            if (affectedRows > 0) {
+                // Retrieve the auto-generated ingredient_id
+                // go through the generated id for each ingredient (in sql), and assign it to the ingredient (in java)
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int generatedId = generatedKeys.getInt(1);
+                        ingredient.setIngredient_id(generatedId);
+                    }
+                }
+                return true;
             }
-        } catch (SQLException e) {
+            return false;
+        }
+
+        catch (SQLException e) 
+        {
+            System.err.println("Error adding ingredients: " + e.getMessage());
+            return false;
+        }
+    } 
+
+    public ArrayList<Ingredient> getIngredientsByBatchNo(int batch_no) {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM INGREDIENT WHERE batch_no = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, batch_no);
+
+            try(ResultSet rs = stmt.executeQuery())
+            {
+                // go thru each row and add it to the arraylist    
+                while (rs.next()) 
+                {
+                    Ingredient ingredient = new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                    ingredients.add(ingredient);
+                }
+            }
+        } 
+
+        catch (SQLException e) 
+        {
             System.err.println("Error fetching ingredients: " + e.getMessage());
         }
 
         return ingredients;
     }
 
-    public ArrayList<String> getIngredientsByCategory(Category category) {
-        ArrayList<String> ingredients = new ArrayList<>();
-        String sqlQuery = "SELECT ingredient_name FROM INGREDIENT WHERE category = ?";
+    public ArrayList<Ingredient> getIngredientsByCategory(Category category) {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM INGREDIENT WHERE category = ?";
+        
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlQuery);
-             ResultSet rs = stmt.executeQuery()) {
-
-            // go thru each row and add it to the arraylist    
-            while (rs.next()) {
-                ingredients.add(rs.getString("ingredient_name"));
-            }
-        } catch (SQLException e) {
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            
+            stmt.setString(1, category.name()); // convert enum to string
+            
+            try(ResultSet rs = stmt.executeQuery()) 
+            {
+                 // go thru each row and add it to the arraylist  
+                while (rs.next()) 
+                {
+                    Ingredient ingredient = new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                    ingredients.add(ingredient);
+                }
+            }   
+            
+        } 
+        catch (SQLException e) 
+        {
             System.err.println("Error fetching ingredients: " + e.getMessage());
         }
 

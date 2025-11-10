@@ -1,3 +1,9 @@
+/*
+ * to run in VS code successfully:
+ *         javac -cp ".;lib\mysql-connector-j-9.5.0.jar" *.java
+ *         java -cp ".;lib\mysql-connector-j-9.5.0.jar" Main
+ */
+
 import java.sql.Connection;
 
 public class Main 
