@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "src.Main",
+            "projectName": "CCINFOM"
+        },
+        {
+            "type": "java",
+            "name": "Run Main with MySQL",
+            "request": "launch",
+            "mainClass": "Main",
+            "classPaths": [
+                "lib/mysql-connector-j-9.5.0.jar"
+            ]
+        }
+    ]
+}
