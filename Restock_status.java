@@ -19,6 +19,6 @@ public enum Restock_status {
         } else {
             return AVAILABLE;
         }
-}
+    }
 }
 

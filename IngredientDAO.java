@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public class IngredientDAO {
 
     public boolean addIngredient(Ingredient ingredient) {
-        Restock_status restock_status = Restock_status.calculateStatus(ingredient.getStock_quantity());
+        // Restock_status restock_status = Restock_status.calculateStatus(ingredient.getStock_quantity());
         String sqlQuery = "INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, " +
-        "measurement_unit, stock_quantity, expiry_date, restock_status) + VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        "measurement_unit, stock_quantity, expiry_date, supplier_id) + VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         // RETURN_GENERATED_KEYS to get the auto generated ingredient_id from the database
         try(Connection conn = DBConnection.getConnection();
@@ -23,11 +23,12 @@ public class IngredientDAO {
             stmt.setString(5, ingredient.getMeasurement_unit().name());
             stmt.setDouble(6, ingredient.getStock_quantity());
             stmt.setDate(7, ingredient.getExpiry_date());
-            stmt.setString(8, ingredient.getRestock_status().name());
-            stmt.setInt(9, ingredient.getSupplier_id()); // ensure that supplier table already has records
+            // stmt.setString(8, ingredient.getRestock_status().name());
+            stmt.setInt(8, ingredient.getSupplier_id()); // ensure that supplier table already has records
 
             int affectedRows = stmt.executeUpdate();
-        
+            
+            // successfully added/inserted if affectedRows > 1
             if (affectedRows > 0) {
                 // Retrieve the auto-generated ingredient_id
                 // go through the generated id for each ingredient (in sql), and assign it to the ingredient (in java)
@@ -56,6 +57,44 @@ public class IngredientDAO {
              PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
             stmt.setInt(1, batch_no);
+
+            try(ResultSet rs = stmt.executeQuery())
+            {
+                // go thru each row and add it to the arraylist    
+                while (rs.next()) 
+                {
+                    Ingredient ingredient = new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                    ingredients.add(ingredient);
+                }
+            }
+        } 
+
+        catch (SQLException e) 
+        {
+            System.err.println("Error fetching ingredients: " + e.getMessage());
+        }
+
+        return ingredients;
+    }
+
+    public ArrayList<Ingredient> getIngredientsBySupplier(int supplier_id) {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM INGREDIENT WHERE supplier_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, supplier_id);
 
             try(ResultSet rs = stmt.executeQuery())
             {
@@ -119,6 +158,44 @@ public class IngredientDAO {
             }   
             
         } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error fetching ingredients: " + e.getMessage());
+        }
+
+        return ingredients;
+    }
+
+    public ArrayList<Ingredient> getIngredientsExpiringSoon() {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM INGREDIENT WHERE expiry_date >= CURDATE() " +
+        "ORDER BY expiry_date ASC LIMIT 30";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            try(ResultSet rs = stmt.executeQuery())
+            {
+                // go thru each row and add it to the arraylist    
+                while (rs.next()) 
+                {
+                    Ingredient ingredient = new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                    ingredients.add(ingredient);
+                }
+            }
+        } 
+
         catch (SQLException e) 
         {
             System.err.println("Error fetching ingredients: " + e.getMessage());
