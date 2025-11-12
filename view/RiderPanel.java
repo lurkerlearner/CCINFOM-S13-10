@@ -164,7 +164,7 @@ public class RiderPanel extends JPanel
         refreshRiderTable();
     }
     
-    // Create the panel for searching deliveries
+    // Create the panel for searching riders
     private void createSearchPanel() 
     {
         searchPanel = new JPanel();
@@ -383,4 +383,5 @@ public class RiderPanel extends JPanel
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
 }
