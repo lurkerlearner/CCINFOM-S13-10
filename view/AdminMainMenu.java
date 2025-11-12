@@ -1,24 +1,19 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
-
-import model.*;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.EventQueue;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ClientMainMenu extends JFrame {
+import javax.swing.*;
+import java.awt.*;
 
-    private Client client;
-    private Location location;
+public class AdminMainMenu extends JFrame {
 
-    public ClientMainMenu(Client client, Location location) {
-        this.client = client;
-        this.location = location;
-
-        setTitle("FloodPanda - Client Main Menu");
+	/**
+	 * Create the frame.
+	 */
+	public AdminMainMenu() {
+		setTitle("FloodPanda - Admin Main Menu");
         setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -42,20 +37,10 @@ public class ClientMainMenu extends JFrame {
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
-        JLabel welcomeLabel = new JLabel("Welcome, " + client.getName() + "! What are you craving today?");
+        JLabel welcomeLabel = new JLabel("Welcome, Admin!");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 22));
         welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         welcomeLabel.setForeground(new Color(51, 51, 51));
-
-        String fullAddress = client.getUnitDetails();
-        if (location != null) {
-            fullAddress += ", " + location.getStreet() + ", " + location.getCity();
-        }
-
-        JLabel locationLabel = new JLabel("Location: " + fullAddress);
-        locationLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
 
         String today = new SimpleDateFormat("MMMM dd, yyyy").format(new Date());
         JLabel dateLabel = new JLabel("Date Today: " + today);
@@ -64,19 +49,17 @@ public class ClientMainMenu extends JFrame {
 
         centerPanel.add(welcomeLabel);
         centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(locationLabel);
-        centerPanel.add(Box.createVerticalStrut(10));
         centerPanel.add(dateLabel);
-        centerPanel.add(Box.createVerticalStrut(40));
+        centerPanel.add(Box.createVerticalStrut(10));
 
         //==PLACEHOLDER BUTTONS PANG ORDER AND DELIVERY AND VIEW SHIT
-        JButton viewCatalogueBtn = new JButton("View Meal Catalogue");
-        JButton orderNowBtn = new JButton("Order Now");
-        JButton accountMgmtBtn = new JButton("Account Management");
+        JButton manageRecordsBtn = new JButton("Manage records");
+        JButton makeTransactionBtn = new JButton("Make a transaction");
+        JButton generateReportBtn = new JButton("Generate a report");
 
         //==PAM PA DESIGN SA BUTTONS
         Dimension btnSize = new Dimension(250, 50);
-        for (JButton btn : new JButton[]{viewCatalogueBtn, orderNowBtn, accountMgmtBtn}) {
+        for (JButton btn : new JButton[]{manageRecordsBtn, makeTransactionBtn, generateReportBtn}) {
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             btn.setPreferredSize(btnSize);
             btn.setMaximumSize(btnSize);
@@ -108,20 +91,22 @@ public class ClientMainMenu extends JFrame {
         //THE ONLY THING THAT'S MINE IS ACCOUNT MANAGEMENT - ELISHA
 
         //==ACTION LISTENERS
-        accountMgmtBtn.addActionListener(e -> {
-            this.dispose();
-            new AccountManagementScreen(client).setVisible(true); // --elishas
+        manageRecordsBtn.addActionListener(e -> {
+			// TODO: implement whatever
+			JOptionPane.showMessageDialog(this, "Manage Records clicked."); // just to test if button works
+            /* this.dispose();
+            new AccountManagementScreen(client).setVisible(true); */
         });
 
-        viewCatalogueBtn.addActionListener(e -> {
+        makeTransactionBtn.addActionListener(e -> {
             // TODO: implement whatever
-            JOptionPane.showMessageDialog(this, "View Meal Catalogue clicked."); // just to test if button works
+            JOptionPane.showMessageDialog(this, "Make a transaction clicked."); // just to test if button works
         });
 
 
-        orderNowBtn.addActionListener(e -> {
+        generateReportBtn.addActionListener(e -> {
             // TODO: implement whatever
-            JOptionPane.showMessageDialog(this, "Order Now clicked."); // just to test if button works
+            JOptionPane.showMessageDialog(this, "Generate a report clicked."); // just to test if button works
         });
 
 
@@ -139,6 +124,6 @@ public class ClientMainMenu extends JFrame {
         });
 
         setVisible(true);
-    }
-}
+	}
 
+}
