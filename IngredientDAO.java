@@ -50,6 +50,129 @@ public class IngredientDAO {
         }
     } 
 
+    public boolean updateIngredient(Ingredient ingredient) {
+        String sqlQuery = "UPDATE INGREDIENT SET batch_no = ?, ingredient_name = ?, category = ?, " +
+        "storage_type = ?, measurement_unit = ?, stock_quantity = ?, expiry_date = ?, " +
+        "supplier_id = ? WHERE ingredient_id = ?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sqlQuery))
+        {
+            stmt.setInt(1, ingredient.getBatch_no());
+            stmt.setString(2, ingredient.getIngredient_name());
+            stmt.setString(3, ingredient.getCategory().name());
+            stmt.setString(4, ingredient.getStorage_type().name());
+            stmt.setString(5, ingredient.getMeasurement_unit().name());
+            stmt.setDouble(6, ingredient.getStock_quantity());
+            stmt.setDate(7, ingredient.getExpiry_date());
+            stmt.setInt(8, ingredient.getSupplier_id());
+            stmt.setInt(9, ingredient.getIngredient_id());
+
+            int affectedRows = stmt.executeUpdate();
+        
+            if (affectedRows > 0) 
+            {
+                System.out.println("Ingredient ID " + ingredient.getIngredient_id() + " successfully updated!");
+                return true;
+            } 
+            else 
+            {
+                System.out.println("No ingredient found with ID: " + ingredient.getIngredient_id());
+                return false;
+            }
+        }
+        catch (SQLException e) 
+        {
+            System.err.println("Error updating ingredient: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteIngredient(int ingredient_id) {
+        String sqlQuery = "DELETE FROM INGREDIENT WHERE ingredient_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, ingredient_id);
+
+            int affectedRows = stmt.executeUpdate();
+            
+            if (affectedRows > 0) 
+            {
+                System.out.println("Ingredient ID " + ingredient_id + " successfully deleted!");
+                return true;
+            } 
+            else 
+            {
+                System.out.println("No ingredient found with ID: " + ingredient_id);
+                return false;
+            }
+        }
+        catch (SQLException e) 
+        {
+            System.err.println("Error deleting ingredient: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateStockQuantity(int ingredient_id, double newQuantity) {
+        String sqlQuery = "UPDATE INGREDIENT SET stock_quantity = ?, restock_status = ? WHERE ingredient_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setDouble(1, newQuantity);
+            stmt.setString(2, Restock_status.calculateStatus(newQuantity).name());
+            stmt.setInt(3, ingredient_id);
+
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        }
+        catch (SQLException e) 
+        {
+            System.err.println("Error updating stock quantity: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public ArrayList<Ingredient> getAllIngredients() {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM INGREDIENT";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+
+            try(ResultSet rs = stmt.executeQuery())
+            {
+                // go thru each row and add it to the arraylist    
+                while (rs.next()) 
+                {
+                    Ingredient ingredient = new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                    ingredients.add(ingredient);
+                }
+            }
+        } 
+
+        catch (SQLException e) 
+        {
+            System.err.println("Error fetching ingredients: " + e.getMessage());
+        }
+
+        return ingredients;
+    }
+
     public ArrayList<Ingredient> getIngredientsByBatchNo(int batch_no) {
         ArrayList<Ingredient> ingredients = new ArrayList<>();
         String sqlQuery = "SELECT * FROM INGREDIENT WHERE batch_no = ?";

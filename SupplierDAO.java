@@ -71,9 +71,9 @@ public class SupplierDAO {
         }
     }
 
-    public boolean deleteSupplier(int supplierId) {
+    public boolean deleteSupplier(int supplier_id) {
         // Check if supplier exists
-        if (supplierId <= 0) {
+        if (supplier_id <= 0) {
             System.err.println("Error: Supplier ID is invalid for deletion");
             return false;
         }
@@ -83,11 +83,20 @@ public class SupplierDAO {
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
-            stmt.setInt(1, supplierId);
+            stmt.setInt(1, supplier_id);
 
             int affectedRows = stmt.executeUpdate();
-            
-            return affectedRows > 0;
+
+            if (affectedRows > 0) 
+            {
+                System.out.println("Supplier ID " + supplier_id + " successfully deleted!");
+                return true;
+            } 
+            else 
+            {
+                System.out.println("No supplier found with ID: " + supplier_id);
+                return false;
+            }
         }
         catch (SQLException e) {
             System.err.println("Error deleting supplier: " + e.getMessage());
