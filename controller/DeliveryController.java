@@ -117,7 +117,94 @@ public class DeliveryController
     {
         return deliveryDAO.getDeliveriesPerLocationWithFloodData();
     }
+
+    // TRANSACTION: ORDER PLACEMENT
+
+    /* 
+     * Confirm client's selected meal by validating if the Meal ID exists and
+     * is available. Record the meal as an order in the Delivery table by
+     * creating a new delivery entry. Alert client if computed flood risk in
+     * their area might cause delivery distruption and ask for confirmation.
+     * 
+     * TABLES INVOLVED
+     * - Delivery
+     * - Meal
+     * - Client
+     * - MealDelivery
+     * - Flood Data
+    */
+    public boolean placeOrder(int mealID, PaymentMode pm, int clientID)
+    {
+        boolean orderPlaced = false;
+
+        Connection c = DBConnection.getConnection();
+
+        // DAOs for involved tables
+        MealDAO mealDAO = new MealDAO();
+        ClientDAO clientDAO = new ClientDAO();
+        RiderDAO riderDAO = new RiderDAO(c);
+        MealDeliveryDAO mealdelDAO = new MealDeliveryDAO(c);
+        FloodDataDAO floodDataDAO = new FloodDataDAO(c);
+
+        Meal order = mealDAO.getMealById(mealID);
+        Client client = clientDAO.getClientByID(clientID);
+
+        // if meal does not exist
+        if (order == null)
+            return orderPlaced;
+        else
+        {
+            Delivery d = new Delivery();
+            Date currDate = new java.sql.Date(System.currentTimeMillis());
+            Time currTime = new java.sql.Time(System.currentTimeMillis());
+
+            // prepare delivery record (not added to table yet)
+            d.setOrderDate(currDate);
+            d.setTimeOrdered(currTime);
+            d.setTimeDelivered(null);
+            d.setPaymentMode(pm);
+            d.setPaymentStatus(PaymentStatus.PENDING);
+            d.setDeliveryMethod(DeliveryMethod.MOTORCYCLE); // default value
+            d.setDeliveryStatus(null);
+            d.setClientID(clientID);
+            d.setMealID(mealID);
+            d.setRiderID(riderDAO.getRandomRiderID()); // assign random rider
+
+            // prepare meal_delivery record (not added to table yet)
+            MealDelivery md = new MealDelivery(mealID, d.getTransactionID(), "");
+
+            // compute flood risk for client's location
+            int location = client.getLocationID();
+            String riskFF = floodDataDAO.getRiskByFloodFactor(location);
+            boolean proceed;
+
+            // ask for client confirmation if needed
+            if (riskFF.equalsIgnoreCase("MODERATE") ||
+                riskFF.equalsIgnoreCase("HIGH") || 
+                riskFF.equalsIgnoreCase("SEVERE"))
+                {
+                    // if yes, insert the created records into their tables
+                    deliveryDAO.addDelivery(d);
+                    mealdelDAO.addMealDelivery(md);
+
+                    orderPlaced = true;
+
+
+                    // if no, do nothing -- di maiinsert sa tables yung records
+                }
+            else // meaning no/low risk in client's location
+            {
+                // automatically insert the created records into their tables
+                deliveryDAO.addDelivery(d);
+                mealdelDAO.addMealDelivery(md);
+
+                orderPlaced = true;
+            }
+        }
+        return orderPlaced;
+    }
 }
 
 
 // junction tables pa
+
