@@ -226,4 +226,27 @@ public class RiderDAO
         }
         return result;
     }
+
+    // Get a random rider (for assigning to deliveries)
+    public int getRandomRiderID() 
+    {
+        int riderID = -1;
+
+        String sql = "SELECT rider_id FROM rider ORDER BY RAND() LIMIT 1";
+
+        try (PreparedStatement stmt = c.prepareStatement(sql))
+        {
+            ResultSet rs = stmt.executeQuery(); 
+            
+            if (rs.next()) 
+                riderID = rs.getInt("rider_id");
+        }    
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+
+        return riderID;
+    }
 }
+
