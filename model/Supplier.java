@@ -14,6 +14,10 @@ public class Supplier {
         this.alt_contact_no = alt_contact_no;
         this.location_id = location_id;
     }
+
+    public Supplier() {
+        // Default constructor
+    }
     public int getSupplier_id() {
         return supplier_id;
     }
