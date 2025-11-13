@@ -500,4 +500,100 @@ public class FloodDataDAO
 
         return result;
     }
+
+    // Determine the flood risk for an area based on flood factor
+    public String getRiskByFloodFactor(int locationID) 
+    {
+        String risk = "NO DATA";
+
+        try 
+        {
+            String sql = """
+                SELECT AVG(
+                    CASE 
+                        WHEN FloodFactor = 'LOW' THEN 1
+                        WHEN FloodFactor = 'MODERATE' THEN 2
+                        WHEN FloodFactor = 'HIGH' THEN 3
+                        WHEN FloodFactor = 'SEVERE' THEN 4
+                        ELSE NULL
+                    END
+                ) AS avgFactor
+                FROM flood_data
+                WHERE LocationID = ?
+            """;
+
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setInt(1, locationID);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) 
+            {
+                double avgFactor = rs.getDouble("avgFactor");
+
+                if (rs.wasNull()) 
+                    risk = "NO DATA";
+                else if (avgFactor < 1.5)
+                    risk = "LOW";
+                else if (avgFactor < 2.5)
+                    risk = "MODERATE";
+                else if (avgFactor < 3.5)
+                    risk = "HIGH";
+                else
+                    risk = "SEVERE";
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+
+        return risk;
+    }
+
+    // Determine the flood risk for an area based on average water level
+    public float getRiskByAverageWaterLevel(int locationID)
+    {
+        float risk = 0.0f;
+
+        try 
+        {
+            String sql = "SELECT AVG(avg_water_level) AS location_avg " +
+                         "FROM flood_data WHERE location_id = ?";
+
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setInt(1, locationID);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) 
+            {
+                risk = rs.getFloat("location_avg");
+                if (rs.wasNull())
+                    risk = 0.0f;
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+
+        return risk;
+    }
+
+    // REPORT: FLOOD IMPACT 
+
+    /*
+     * Show which clients are affected by a higher risk of flood
+     * disruptions in terms of location and accessibility. Summarize
+     * how sales are affected in their areas.
+     * 
+     * RECORDS/TABLES INVOLVED
+     * - Flood Data
+     * - Client
+     * - Delivery
+     * - Location
+     */
+    public void generateFloodImpactReport()
+    {
+        
+    }
 }
