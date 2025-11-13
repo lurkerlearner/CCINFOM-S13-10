@@ -37,6 +37,13 @@ public class FloodPandaWelcome extends JFrame {
             b.setPreferredSize(buttonSize);
             b.setMaximumSize(buttonSize);
             b.setMinimumSize(buttonSize);
+            b.setFont(new Font("Arial", Font.BOLD, 16));
+
+            b.setBackground(new Color(255, 214, 221));
+            b.setOpaque(true);
+            b.setContentAreaFilled(true);
+            b.setFocusPainted(true);
+            b.setBorder(BorderFactory.createLineBorder(Color.PINK, 2));
         }
 
         //==PANG SPACING
