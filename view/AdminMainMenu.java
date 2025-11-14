@@ -90,7 +90,7 @@ public class AdminMainMenu extends JFrame {
         //==ACTION LISTENERS
         manageRecordsBtn.addActionListener(e -> {
             this.dispose();
-            new ManageRecordsFrame().setVisible(true);
+            new ManageRecordsFrame().setVisible(true); // Faith
         });
 
         makeTransactionBtn.addActionListener(e -> {

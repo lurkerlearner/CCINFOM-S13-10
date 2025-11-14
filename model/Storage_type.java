@@ -8,5 +8,25 @@ package model;/*
  * @author faith
  */
 public enum Storage_type {
-    DRY, FROZEN, REFRIGERATED;
+    DRY("Dry"), 
+    FROZEN("Frozen"), 
+    REFRIGERATED("Refrigerated");
+
+    private final String dbValue;
+
+    Storage_type(String dbValue) 
+    {
+        this.dbValue = dbValue;
+    }
+
+    public String getDbValue() 
+    {
+        return dbValue;
+    }
+
+    // converts db string value to java enum because java enums needs to be all caps and no spaces
+    public static Storage_type fromDbValue(String dbVal) 
+    {
+        return valueOf(dbVal.toUpperCase());
+    }
 }

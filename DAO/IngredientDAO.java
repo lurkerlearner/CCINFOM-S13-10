@@ -22,9 +22,9 @@ public class IngredientDAO {
         {
             stmt.setInt(1, ingredient.getBatch_no());
             stmt.setString(2, ingredient.getIngredient_name());
-            stmt.setString(3, ingredient.getCategory().name());
-            stmt.setString(4, ingredient.getStorage_type().name());
-            stmt.setString(5, ingredient.getMeasurement_unit().name());
+            stmt.setString(3, ingredient.getCategory().getDbValue());
+            stmt.setString(4, ingredient.getStorage_type().getDbValue());
+            stmt.setString(5, ingredient.getMeasurement_unit().getDbValue());
             stmt.setDouble(6, ingredient.getStock_quantity());
             stmt.setDate(7, ingredient.getExpiry_date());
             // stmt.setString(8, ingredient.getRestock_status().name());
@@ -64,9 +64,9 @@ public class IngredientDAO {
         {
             stmt.setInt(1, ingredient.getBatch_no());
             stmt.setString(2, ingredient.getIngredient_name());
-            stmt.setString(3, ingredient.getCategory().name());
-            stmt.setString(4, ingredient.getStorage_type().name());
-            stmt.setString(5, ingredient.getMeasurement_unit().name());
+            stmt.setString(3, ingredient.getCategory().getDbValue());
+            stmt.setString(4, ingredient.getStorage_type().getDbValue());
+            stmt.setString(5, ingredient.getMeasurement_unit().getDbValue());
             stmt.setDouble(6, ingredient.getStock_quantity());
             stmt.setDate(7, ingredient.getExpiry_date());
             stmt.setInt(8, ingredient.getSupplier_id());
@@ -127,7 +127,7 @@ public class IngredientDAO {
              PreparedStatement stmt = conn.prepareStatement(sqlQuery))
         {
             stmt.setDouble(1, newQuantity);
-            stmt.setString(2, Restock_status.calculateStatus(newQuantity).name());
+            stmt.setString(2, Restock_status.calculateStatus(newQuantity).getDbValue());
             stmt.setInt(3, ingredient_id);
 
             int affectedRows = stmt.executeUpdate();
@@ -156,12 +156,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -194,12 +194,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -232,12 +232,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -272,12 +272,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -310,12 +310,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -347,12 +347,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                     ingredients.add(ingredient);
@@ -381,12 +381,12 @@ public class IngredientDAO {
                         rs.getInt("ingredient_id"),
                         rs.getInt("batch_no"),
                         rs.getString("ingredient_name"),
-                        Category.valueOf(rs.getString("category")),
-                        Storage_type.valueOf(rs.getString("storage_type")),
-                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        Category.fromDbValue(rs.getString("category")),
+                        Storage_type.fromDbValue(rs.getString("storage_type")),
+                        Measurement_unit.fromDbValue(rs.getString("measurement_unit")),
                         rs.getDouble("stock_quantity"),
                         rs.getDate("expiry_date"),
-                        Restock_status.valueOf(rs.getString("restock_status")),
+                        Restock_status.fromDbValue(rs.getString("restock_status")),
                         rs.getInt("supplier_id")
                     );
                 }

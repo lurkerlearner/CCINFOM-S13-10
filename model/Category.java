@@ -8,5 +8,29 @@ package model;/*
  * @author faith
  */
 public enum Category {
-    PROTEIN, DAIRY, GRAINS, FAT, CONDIMENTS
+    PROTEIN("Protein"), 
+    PRODUCE("Produce"), 
+    DAIRY("Dairy"), 
+    GRAINS("Grains"), 
+    FAT("Fat"), 
+    CONDIMENTS("Condiments");
+
+    private final String dbValue;
+
+    Category(String dbValue) 
+    {
+        this.dbValue = dbValue;
+    }
+
+    public String getDbValue() 
+    {
+        return dbValue;
+    }
+
+    // converts db string value to java enum because java enums needs to be all caps and no spaces
+    public static Category fromDbValue(String dbVal) 
+    {
+        return valueOf(dbVal.toUpperCase());
+    }
+
 }

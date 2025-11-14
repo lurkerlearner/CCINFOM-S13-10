@@ -125,5 +125,19 @@ public class Ingredient {
     public void setSupplier_id(int supplier_id) {
         this.supplier_id = supplier_id;
     }
+
+    @Override
+    public String toString() {
+        return "Ingredient ID: " + ingredient_id + "\n" +
+                "Batch Number: " + batch_no + "\n" +
+                "Ingredient Name: " + ingredient_name + "\n" +
+                "Category: " + category + "\n" +
+                "Storage Type: " + storage_type + "\n" +
+                "Measurement Unit: " + measurement_unit + "\n" +
+                "Stock Quantity: " + stock_quantity + "\n" +
+                "Expiry Date: " + expiry_date + "\n" +
+                "Restock Status: " + restock_status + "\n" +
+                "Supplier ID: " + supplier_id;
+    }
     
 }   

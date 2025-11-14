@@ -8,5 +8,26 @@ package model;/*
  * @author faith
  */
 public enum Measurement_unit {
-    GRAMS, LITRES;
+    GRAMS("grams"), 
+    LITRES("litres");
+
+    private final String dbValue;
+
+    Measurement_unit(String dbValue) 
+    {
+        this.dbValue = dbValue;
+    }
+
+    public String getDbValue() 
+    {
+        return dbValue;
+    }
+
+    // converts db string value to java enum because java enums needs to be all caps and no spaces
+    public static Measurement_unit fromDbValue(String dbVal) 
+    {
+        return valueOf(dbVal.toUpperCase());
+    }
+
+
 }

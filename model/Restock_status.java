@@ -9,7 +9,21 @@ package model;/*
  */
 
 public enum Restock_status {
-    AVAILABLE, LOW_STOCK, OUT_OF_STOCK;
+    AVAILABLE("Available"), 
+    LOW_STOCK("Low Stock"), 
+    OUT_OF_STOCK("Out of Stock");
+
+    private final String dbValue;
+
+    Restock_status(String dbValue) 
+    {
+        this.dbValue = dbValue;
+    }
+
+    public String getDbValue() 
+    {
+        return dbValue;
+    }
 
     public static Restock_status calculateStatus(double stock_quantity) {
     if (stock_quantity == 0) {
@@ -19,6 +33,12 @@ public enum Restock_status {
         } else {
             return AVAILABLE;
         }
+    }
+
+    // converts db string value to java enum because java enums needs to be all caps and no spaces
+    public static Restock_status fromDbValue(String dbVal) 
+    {
+        return valueOf(dbVal.toUpperCase().replace(" ", "_"));
     }
 }
 
