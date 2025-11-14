@@ -4,19 +4,26 @@ import javax.swing.*;
 import java.awt.*;
 
 import model.*;
-import javax.swing.*;
-import java.awt.*;
+import controller.MealController;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import view.ViewMealCatalogueScreen;
+import DAO.MealIngredientDAO;
+import DAO.IngredientDAO;
 
 public class ClientMainMenu extends JFrame {
 
     private Client client;
     private Location location;
+    private DAO.MealIngredientDAO mealIngredientDAO;
+    private DAO.IngredientDAO ingredientDAO;
 
     public ClientMainMenu(Client client, Location location) {
         this.client = client;
         this.location = location;
+
+        this.mealIngredientDAO = new DAO.MealIngredientDAO();
+        this.ingredientDAO = new DAO.IngredientDAO();
 
         setTitle("FloodPanda - Client Main Menu");
         setSize(800, 600);
@@ -74,6 +81,12 @@ public class ClientMainMenu extends JFrame {
         JButton orderNowBtn = new JButton("Order Now");
         JButton accountMgmtBtn = new JButton("Account Management");
 
+        // create controller for catalogue view
+        MealController mealController = new MealController();
+
+        this.mealIngredientDAO = new DAO.MealIngredientDAO();
+        this.ingredientDAO = new DAO.IngredientDAO();
+
         //==PAM PA DESIGN SA BUTTONS
         Dimension btnSize = new Dimension(250, 50);
         for (JButton btn : new JButton[]{viewCatalogueBtn, orderNowBtn, accountMgmtBtn}) {
@@ -114,8 +127,8 @@ public class ClientMainMenu extends JFrame {
         });
 
         viewCatalogueBtn.addActionListener(e -> {
-            // TODO: implement whatever
-            JOptionPane.showMessageDialog(this, "View Meal Catalogue clicked."); // just to test if button works
+            this.dispose();
+            new ViewMealCatalogueScreen(mealController, mealIngredientDAO, ingredientDAO).setVisible(true); // Theo
         });
 
 
@@ -141,4 +154,3 @@ public class ClientMainMenu extends JFrame {
         setVisible(true);
     }
 }
-
