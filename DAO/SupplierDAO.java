@@ -4,6 +4,7 @@ import model.*;
 import app.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class SupplierDAO {
 
@@ -106,6 +107,98 @@ public class SupplierDAO {
             System.err.println("Error deleting supplier: " + e.getMessage());
             return false;
         }
+    }
+
+    public ArrayList<Supplier> getAllSuppliers() {
+        ArrayList<Supplier> suppliers = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM SUPPLIER";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            try (ResultSet rs = stmt.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    Supplier supplier = new Supplier(
+                        rs.getInt("supplier_id"),
+                        rs.getString("supplier_name"),
+                        rs.getInt("contact_no"),
+                        rs.getInt("alt_contact_no"),
+                        rs.getInt("location_id")
+                    );
+                    suppliers.add(supplier);
+                }
+            } 
+        }
+        catch (SQLException e) 
+        {
+            System.err.println("Error retrieving suppliers: " + e.getMessage());
+        }
+
+        return suppliers;
+    }
+
+    public ArrayList<Supplier> getSuppliersByLocation(int location_id) {
+        ArrayList<Supplier> suppliers = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM SUPPLIER WHERE location_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, location_id);
+
+            try (ResultSet rs = stmt.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    Supplier supplier = new Supplier(
+                        rs.getInt("supplier_id"),
+                        rs.getString("supplier_name"),
+                        rs.getInt("contact_no"),
+                        rs.getInt("alt_contact_no"),
+                        rs.getInt("location_id")
+                    );
+                    suppliers.add(supplier);
+                }
+            } 
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error retrieving suppliers by location: " + e.getMessage());
+        }
+
+        return suppliers;
+    }
+
+    public Supplier getSupplierById(int supplier_id) {
+        String sqlQuery = "SELECT * FROM SUPPLIER WHERE supplier_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, supplier_id);
+
+            try (ResultSet rs = stmt.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    return new Supplier(
+                        rs.getInt("supplier_id"),
+                        rs.getString("supplier_name"),
+                        rs.getInt("contact_no"),
+                        rs.getInt("alt_contact_no"),
+                        rs.getInt("location_id")
+                    );
+                }
+            } 
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error retrieving supplier by ID: " + e.getMessage());
+        }
+
+        return null; // Return null if supplier not found
     }
 
 }

@@ -10,9 +10,9 @@ import java.awt.*;
 import java.util.*;
 import java.sql.Date;
 
-public class IngredientPanel extends JPanel
+public class SupplierPanel extends JPanel
 {
-    private IngredientController controller;
+    private SupplierController controller;
 
     // UI Components
     private JTabbedPane tabbedPane;
@@ -20,33 +20,29 @@ public class IngredientPanel extends JPanel
     private JPanel viewPanel;
     private JPanel searchPanel;
 
-    // Components for adding ingredients
-    private JTextField batch_no;
-    private JTextField ingredient_name;
-    private JComboBox<String> category;
-    private JComboBox<String> storage_type;
-    private JComboBox<String> measurement_unit;
-    private JTextField stock_quantity;  
-    private JTextField expiry_date;
-    private JTextField supplier_id;
+    // Components for adding suppliers
+    private JTextField supplier_name;
+    private JTextField contact_no;
+    private JTextField alt_contact_no;
+    private JTextField location_id;
     private JButton addButton;
 
-    // Components for viewing ingredients
-    private JTable ingredientTable;
+    // Components for viewing suppliers
+    private JTable supplierTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton;
     private JButton detailsButton;
 
-    // Components for searching ingredients
+    // Components for searching suppliers
     private JButton searchButton;
     private JComboBox<String> searchTypeComboBox;
     private JTextField searchField;
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
 
-    public IngredientPanel(IngredientController ingredientController)
+    public SupplierPanel (SupplierController supplierController)
     {
-        this.controller = ingredientController;
+        this.controller = supplierController;
 
         setLayout(new BorderLayout());
 
@@ -64,14 +60,14 @@ public class IngredientPanel extends JPanel
         createViewPanel();
         createSearchPanel();
         
-        tabbedPane.addTab("Add Ingredient", addPanel);
+        tabbedPane.addTab("Add Supplier", addPanel);
         tabbedPane.addTab("View All", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
         
         add(tabbedPane, BorderLayout.CENTER);
     }
 
-    // Create the panel for adding an ingredient record
+    // Create the panel for adding a supplier record
     private void createAddPanel()
     {
         addPanel = new JPanel();
@@ -84,78 +80,40 @@ public class IngredientPanel extends JPanel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-
-        String[] categories = Arrays.stream(Category.values())
-                                    .map(Category::getDbValue)
-                                    .toArray(String[]::new);
         
-        String[] storageTypes = Arrays.stream(Storage_type.values())
-                                    .map(Storage_type::getDbValue)
-                                    .toArray(String[]::new);
-        
-        String[] measurementUnits = Arrays.stream(Measurement_unit.values())
-                                    .map(Measurement_unit::getDbValue)
-                                    .toArray(String[]::new);
-
-        // String[] restockStatuses if needed
-
         // size of textfield na columns is the number of m that can fit in a text field
-        batch_no = new JTextField(5);
-        ingredient_name = new JTextField(20);
-        category = new JComboBox<>(categories);
-        storage_type = new JComboBox<>(storageTypes);
-        measurement_unit = new JComboBox<>(measurementUnits);
-        stock_quantity = new JTextField(8);
-        expiry_date = new JTextField(10);
-        supplier_id = new JTextField(5);
+        supplier_name = new JTextField(20);
+        contact_no = new JTextField(15);
+        alt_contact_no = new JTextField(15);
+        location_id = new JTextField(5);
 
         // x and y refer to row and column respectively
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Batch No:"), gbc);
+        formPanel.add(new JLabel("Supplier Name:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(batch_no, gbc);
+        formPanel.add(supplier_name, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Ingredient Name:"), gbc);
+        formPanel.add(new JLabel("Contact Number:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(ingredient_name, gbc);
+        formPanel.add(contact_no, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
-        formPanel.add(new JLabel("Category:"), gbc);
+        formPanel.add(new JLabel("Alternative Contact Number:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(category, gbc);
+        formPanel.add(alt_contact_no, gbc);
 
         gbc.gridx = 0; gbc.gridy = 3;
-        formPanel.add(new JLabel("Storage Type:"), gbc);
+        formPanel.add(new JLabel("Location ID:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(storage_type, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 4;
-        formPanel.add(new JLabel("Measurement Unit:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(measurement_unit, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 5;
-        formPanel.add(new JLabel("Stock Quantity:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(stock_quantity, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 6;
-        formPanel.add(new JLabel("Expiry Date (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(expiry_date, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 7;
-        formPanel.add(new JLabel("Supplier ID:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(supplier_id, gbc);
+        formPanel.add(location_id, gbc);
 
         // Create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
-        addButton = new JButton("Add Ingredient");
-        addButton.addActionListener(e -> addIngredient());
+        addButton = new JButton("Add Supplier");
+        addButton.addActionListener(e -> addSupplier());
         
         buttonPanel.add(addButton);
         
@@ -164,25 +122,21 @@ public class IngredientPanel extends JPanel
         addPanel.add(buttonPanel, BorderLayout.SOUTH);
     }    
 
-    // Add a new ingredient using the input fields
-    private void addIngredient() 
+    // Add a new supplier using the input fields
+    private void addSupplier() 
     {
         try 
         {
-            int batchNo = Integer.parseInt(batch_no.getText().trim());
-            String name = ingredient_name.getText().trim();
-            Category categ = Category.fromDbValue((String) category.getSelectedItem());
-            Storage_type storageType = Storage_type.fromDbValue((String) storage_type.getSelectedItem());
-            Measurement_unit measureUnit = Measurement_unit.fromDbValue((String) measurement_unit.getSelectedItem());
-            double stockQty = Double.parseDouble(stock_quantity.getText().trim());
-            Date expiryDate = java.sql.Date.valueOf(expiry_date.getText().trim());
-            int supplierId = Integer.parseInt(supplier_id.getText().trim());
+            String name = supplier_name.getText().trim();
+            int contactNo = Integer.parseInt(contact_no.getText().trim());
+            int altContactNo = Integer.parseInt(alt_contact_no.getText().trim());
+            int locationId = Integer.parseInt(location_id.getText().trim());
 
-            controller.addIngredient(batchNo, name, categ, storageType, measureUnit, stockQty, expiryDate, supplierId);
+            controller.addSupplier(name, contactNo, altContactNo, locationId);
 
-            JOptionPane.showMessageDialog(this, "Ingredient added successfully!");
+            JOptionPane.showMessageDialog(this, "Supplier added successfully!");
             clearAddFields();
-            refreshIngredientTable();
+            refreshSupplierTable();
 
         } 
         catch (IllegalArgumentException ex) 
@@ -198,17 +152,13 @@ public class IngredientPanel extends JPanel
     // Clear input fields after adding
     private void clearAddFields()
     {
-        batch_no.setText("");
-        ingredient_name.setText("");
-        category.setSelectedItem(null);
-        storage_type.setSelectedItem(null);
-        measurement_unit.setSelectedItem(null);
-        stock_quantity.setText("");
-        expiry_date.setText("");
-        supplier_id.setText("");
+        supplier_name.setText("");
+        contact_no.setText("");
+        alt_contact_no.setText("");
+        location_id.setText("");
     }
 
-    // Create the panel for viewing all ingredients
+    // Create the panel for viewing all suppliers
     private void createViewPanel()
     {
         viewPanel = new JPanel();
@@ -216,12 +166,10 @@ public class IngredientPanel extends JPanel
         viewPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         String[] columnNames = {
-            "Ingredient ID", "Batch No", "Ingredient Name", "Category", "Storage Type", 
-            "Measurement Unit", "Stock Quantity", "Expiry Date", 
-            "Restock Status", "Supplier ID"
+            "Supplier ID", "Supplier Name", "Contact No", "Alt Contact No", "Location ID"
         };
 
-        // create a view-only table of the ingredients
+        // create a view-only table of the suppliers
         tableModel = new DefaultTableModel(columnNames, 0) 
         {
             @Override
@@ -231,87 +179,83 @@ public class IngredientPanel extends JPanel
             }
         };
 
-        ingredientTable = new JTable(tableModel);
-        ingredientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        ingredientTable.getTableHeader().setReorderingAllowed(false);
+        supplierTable = new JTable(tableModel);
+        supplierTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        supplierTable.getTableHeader().setReorderingAllowed(false);
 
         // Create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
         refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> refreshIngredientTable());
+        refreshButton.addActionListener(e -> refreshSupplierTable());
         
         detailsButton = new JButton("View Details");
-        detailsButton.addActionListener(e -> showIngredientDetails());
+        detailsButton.addActionListener(e -> showSupplierDetails());
 
         buttonPanel.add(refreshButton);
         buttonPanel.add(detailsButton);
         
-        viewPanel.add(new JScrollPane(ingredientTable), BorderLayout.CENTER);
+        viewPanel.add(new JScrollPane(supplierTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         // Populate the table
-        refreshIngredientTable();
+        refreshSupplierTable();
     }
 
-    // refresh table with newly added ingredient(s)
-    private void refreshIngredientTable() 
+    // refresh table with newly added supplier(s)
+    private void refreshSupplierTable() 
     {
         tableModel.setRowCount(0); // Clear table
 
-        // get all ingredients
-        ArrayList<Ingredient> ingredients = controller.getAllIngredients();
+        // get all suppliers
+        ArrayList<Supplier> supplier = controller.getAllSuppliers();
         
         // populate table with updated data
-        for (Ingredient ing : ingredients) {
+        for (Supplier sup : supplier) 
+        {
             Object[] row = new Object[]
             {
-                ing.getIngredient_id(),
-                ing.getBatch_no(),
-                ing.getIngredient_name(),
-                ing.getCategory(),
-                ing.getStorage_type(),
-                ing.getMeasurement_unit(),
-                ing.getStock_quantity(),
-                ing.getExpiry_date(),
-                ing.getRestock_status(),
-                ing.getSupplier_id()
+                sup.getSupplier_id(),
+                sup.getSupplier_name(),
+                sup.getContact_no(),
+                sup.getAlt_contact_no(),
+                sup.getLocation_id()
             };
 
             tableModel.addRow(row);
         }
     }
 
-    // Show detailed information about the selected ingredient
-    private void showIngredientDetails() 
+    // Show detailed information about the selected supplier
+    private void showSupplierDetails() 
     {
-        int selectedRow = ingredientTable.getSelectedRow();
+        int selectedRow = supplierTable.getSelectedRow();
         
         if (selectedRow == -1) 
         {
-            JOptionPane.showMessageDialog(this, "Please select an ingredient to view details.",
+            JOptionPane.showMessageDialog(this, "Please select a supplier to view details.",
                                         "No Selection", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
-        int ingredientID = (int) tableModel.getValueAt(selectedRow, 0);
-        Ingredient ingredient = controller.getIngredientByID(ingredientID);
+        int supplierID = (int) tableModel.getValueAt(selectedRow, 0);
+        Supplier supplier = controller.getSupplierByID(supplierID);
         
-        if (ingredient != null) {
-            JTextArea textArea = new JTextArea(ingredient.toString());
+        if (supplier != null) {
+            JTextArea textArea = new JTextArea(supplier.toString());
             textArea.setEditable(false);
             textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(400, 300));
             
-            JOptionPane.showMessageDialog(this, scrollPane, "Ingredient Details", 
+            JOptionPane.showMessageDialog(this, scrollPane, "Supplier Details", 
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    // Create the panel for searching ingredients
+    // Create the panel for searching suppliers
     private void createSearchPanel() 
     {
         searchPanel = new JPanel();
@@ -322,14 +266,13 @@ public class IngredientPanel extends JPanel
         JPanel searchControls = new JPanel();
         searchControls.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        // add Expiring Soon, Restock status (available, low, out of stock) options if needed
         searchTypeComboBox = new JComboBox<>(new String[] {
-            "By Ingredient ID", "By Category", "By Batch No", "By Supplier ID"
+            "By Supplier ID", "By Location ID"
         });
 
         searchField = new JTextField(15);
         searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> searchIngredient());
+        searchButton.addActionListener(e -> searchSupplier());
 
         searchControls.add(new JLabel("Search:"));
         searchControls.add(searchTypeComboBox);
@@ -337,9 +280,7 @@ public class IngredientPanel extends JPanel
         searchControls.add(searchButton);
 
         String[] columnNames = {
-            "Ingredient ID", "Batch No", "Ingredient Name", "Category", "Storage Type", 
-            "Measurement Unit", "Stock Quantity", "Expiry Date", 
-            "Restock Status", "Supplier ID"
+            "Supplier ID", "Supplier Name", "Contact No", "Alt Contact No", "Location ID"
         };
 
         // create a view-only table of the search/filtered results
@@ -370,33 +311,25 @@ public class IngredientPanel extends JPanel
         searchPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Search for an ingredient record based on the selected criteria
-    private void searchIngredient() {
+    // Search for a supplier record based on the selected criteria
+    private void searchSupplier() {
         searchTableModel.setRowCount(0); // Clear previous results
 
         String searchType = (String) searchTypeComboBox.getSelectedItem();
         String query = searchField.getText().trim();
 
-        ArrayList<Ingredient> results = new ArrayList<>();
+        ArrayList<Supplier> results = new ArrayList<>();
 
         try {
             switch (searchType) {
-                case "By Ingredient ID":
-                    int ingredientId = Integer.parseInt(query);
-                    Ingredient i = controller.getIngredientByID(ingredientId);
-                    if (i != null) results.add(i);
-                    break;
-                case "By Category":
-                    Category category = Category.fromDbValue(query);
-                    results = controller.getIngredientsByCategory(category);
-                    break;
-                case "By Batch No":
-                    int batchNo = Integer.parseInt(query);
-                    results = controller.getIngredientsByBatchNo(batchNo);
-                    break;
                 case "By Supplier ID":
                     int supplierId = Integer.parseInt(query);
-                    results = controller.getIngredientsBySupplier(supplierId);
+                    Supplier s = controller.getSupplierByID(supplierId);
+                    if (s != null) results.add(s);
+                    break;
+                case "By Location ID":
+                    int locationId = Integer.parseInt(query);
+                    results = controller.getSuppliersByLocation(locationId);
                     break;
                 default:
                     JOptionPane.showMessageDialog(this, "Unknown search type.", 
@@ -419,20 +352,15 @@ public class IngredientPanel extends JPanel
         }
 
         // Populate search results table
-        for (Ingredient ing : results) 
+        for (Supplier sup : results) 
         {
             Object[] row = new Object[]
             {
-                ing.getIngredient_id(),
-                ing.getBatch_no(),
-                ing.getIngredient_name(),
-                ing.getCategory(),
-                ing.getStorage_type(),
-                ing.getMeasurement_unit(),
-                ing.getStock_quantity(),
-                ing.getExpiry_date(),
-                ing.getRestock_status(),
-                ing.getSupplier_id()
+                sup.getSupplier_id(),
+                sup.getSupplier_name(),
+                sup.getContact_no(),
+                sup.getAlt_contact_no(),
+                sup.getLocation_id()
             };
 
             searchTableModel.addRow(row);
@@ -440,7 +368,7 @@ public class IngredientPanel extends JPanel
 
         if (results.isEmpty()) 
         {
-            JOptionPane.showMessageDialog(this, "No ingredients found matching the search criteria.",
+            JOptionPane.showMessageDialog(this, "No suppliers found matching the search criteria.",
                                         "No Results", JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -453,24 +381,24 @@ public class IngredientPanel extends JPanel
         
         if (selectedRow == -1) 
         {
-            JOptionPane.showMessageDialog(this, "Please select an ingredient to view details.",
+            JOptionPane.showMessageDialog(this, "Please select a supplier to view details.",
                                         "No Selection", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        int ingredientID = (int) searchTableModel.getValueAt(selectedRow, 0);
-        Ingredient ingredient = controller.getIngredientByID(ingredientID);
+        int supplierID = (int) searchTableModel.getValueAt(selectedRow, 0);
+        Supplier supplier = controller.getSupplierByID(supplierID);
         
-        if (ingredient != null) 
+        if (supplier != null) 
         {
-            JTextArea textArea = new JTextArea(ingredient.toString());
+            JTextArea textArea = new JTextArea(supplier.toString());
             textArea.setEditable(false);
             textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(400, 300));
             
-            JOptionPane.showMessageDialog(this, scrollPane, "Ingredient Details", 
+            JOptionPane.showMessageDialog(this, scrollPane, "Supplier Details", 
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }

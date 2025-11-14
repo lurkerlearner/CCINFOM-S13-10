@@ -2,6 +2,7 @@ package controller;
 
 import DAO.SupplierDAO;
 import model.Supplier;
+import java.util.ArrayList;
 
 public class SupplierController {
     private final SupplierDAO supplierDAO;
@@ -22,5 +23,17 @@ public class SupplierController {
 
     public boolean deleteSupplier(int supplier_id) {
         return supplierDAO.deleteSupplier(supplier_id);
+    }
+
+    public ArrayList<Supplier> getAllSuppliers() {
+        return supplierDAO.getAllSuppliers();
+    }
+
+    public ArrayList<Supplier> getSuppliersByLocation(int locationId) {
+        return supplierDAO.getSuppliersByLocation(locationId);
+    }
+
+    public Supplier getSupplierByID(int supplierId) {
+        return supplierDAO.getSupplierById(supplierId);
     }
 }
