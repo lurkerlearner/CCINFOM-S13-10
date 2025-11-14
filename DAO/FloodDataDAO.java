@@ -583,8 +583,9 @@ public class FloodDataDAO
 
     /*
      * Show which clients are affected by a higher risk of flood
-     * disruptions in terms of location and accessibility. Summarize
-     * how sales are affected in their areas.
+     * disruptions in terms of severity and water level based off
+     * historical flooding records. Summarize how sales are affected
+     * in their areas for the year and quarter needed.
      * 
      * RECORDS/TABLES INVOLVED
      * - Flood Data
@@ -592,8 +593,118 @@ public class FloodDataDAO
      * - Delivery
      * - Location
      */
-    public void generateFloodImpactReport()
+    public ArrayList<FloodImpactReport> generateFloodImpactReport(int year, int quarter)
     {
+        java.sql.Date startDate = null;
+        java.sql.Date endDate = null;
+
+        switch (quarter)
+        {
+            case 1 -> 
+            {
+                startDate = java.sql.Date.valueOf(year + "-01-01");
+                endDate   = java.sql.Date.valueOf(year + "-03-31");
+            }
+            case 2 -> 
+            {
+                startDate = java.sql.Date.valueOf(year + "-04-01");
+                endDate   = java.sql.Date.valueOf(year + "-06-30");
+            }
+            case 3 -> 
+            {
+                startDate = java.sql.Date.valueOf(year + "-07-01");
+                endDate   = java.sql.Date.valueOf(year + "-09-30");
+            }
+            case 4 -> 
+            {
+                startDate = java.sql.Date.valueOf(year + "-10-01");
+                endDate   = java.sql.Date.valueOf(year + "-12-31");
+            }
+        }
+
+        ArrayList<FloodImpactReport> report = new ArrayList<>();
+
+        String sql = """
+                    SELECT 
+                        c.client_id AS "Client ID",
+                        c.name AS Name,
+                        l.location_id,
+                        l.street_address AS Street,
+                        l.city AS City,
+                        COUNT(d.transaction_id) AS Sales
+                    FROM client c
+                    JOIN location l ON c.location_id = l.location_id
+                    LEFT JOIN delivery d ON c.client_id = d.client_id
+                              AND d.order_date BETWEEN ? AND ?
+                    GROUP BY c.client_id, c.name, l.location_id, l.street_address, l.city;
+                """;
         
+        try (PreparedStatement ps = c.prepareStatement(sql)) 
+        {
+            ps.setDate(1, startDate);
+            ps.setDate(2, endDate);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) 
+            {
+                int cid = rs.getInt("Client ID");
+                String n = rs.getString("Name");
+                String st = rs.getString("Street");
+                String ct = rs.getString("City");
+
+                int locID = rs.getInt("location_id");
+
+                // risk calculations
+                String rbff = getRiskByFloodFactor(locID);
+                double rbawl = getRiskByAverageWaterLevel(locID);
+
+                int sl = rs.getInt("Sales");
+
+                report.add(new FloodImpactReport(cid, n, st, ct, rbff, rbawl, sl));
+            }
+
+            // reorder so that highest overall risk is at the top
+            report.sort((r1, r2) -> 
+            {
+                int severity1 = getFloodSeverityRank(r1.getRiskByFactor());
+                int severity2 = getFloodSeverityRank(r2.getRiskByFactor());
+
+                // flood factor descending
+                int cmp = Integer.compare(severity2, severity1);
+                if (cmp != 0) return cmp;
+
+                // average water level descending
+                return Double.compare(r2.getRiskByAWL(), r1.getRiskByAWL());
+            });
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+
+        return report;
     }
+
+    // HELPER METHODS for generating Flood Impact Report
+
+    // ordering via flood risk severity based on quarterly flood factor
+    public int getFloodSeverityRank(String risk) 
+    {
+        int rank;
+        switch (risk) 
+        {
+            case "LOW":
+                rank = 1;
+            case "MODERATE":
+                rank = 2;
+            case "HIGH":
+                rank = 3;
+            case "SEVERE":
+                rank = 4;
+            default:
+                rank = 0;
+        };
+        return rank;
+    }  
 }
+
