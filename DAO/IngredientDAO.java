@@ -368,4 +368,35 @@ public class IngredientDAO {
         return ingredients;
     }
 
+    public Ingredient getIngredientById(int ingredient_id) {
+        String sqlQuery = "SELECT * FROM INGREDIENT WHERE ingredient_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
+
+            stmt.setInt(1, ingredient_id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Ingredient(
+                        rs.getInt("ingredient_id"),
+                        rs.getInt("batch_no"),
+                        rs.getString("ingredient_name"),
+                        Category.valueOf(rs.getString("category")),
+                        Storage_type.valueOf(rs.getString("storage_type")),
+                        Measurement_unit.valueOf(rs.getString("measurement_unit")),
+                        rs.getDouble("stock_quantity"),
+                        rs.getDate("expiry_date"),
+                        Restock_status.valueOf(rs.getString("restock_status")),
+                        rs.getInt("supplier_id")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching ingredient by ID: " + e.getMessage());
+        }
+
+        return null;
+    }
+
 }
