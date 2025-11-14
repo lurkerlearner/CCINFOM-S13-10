@@ -76,6 +76,44 @@ public class MealDAO {
         return meals;
         }
 
+    public List<Meal> getMealsSortedByPriceAscending() {
+        List<Meal> meals = new ArrayList<>();
+        String query = "SELECT meal_id, meal_name, price, cost, preparation_time, calories, nutrients, date_added, diet_preference_id, ingredient_id FROM meal ORDER BY price ASC";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Meal meal = mapResultSetToMeal(resultSet);
+                meals.add(meal);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving meals sorted by price (ascending): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return meals;
+    }
+
+    public List<Meal> getMealsSortedByPriceDescending() {
+        List<Meal> meals = new ArrayList<>();
+        String query = "SELECT meal_id, meal_name, price, cost, preparation_time, calories, nutrients, date_added, diet_preference_id, ingredient_id FROM meal ORDER BY price DESC";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Meal meal = mapResultSetToMeal(resultSet);
+                meals.add(meal);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving meals sorted by price (descending): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return meals;
+    }
+
     public boolean addMeal(Meal meal) {
     String query = "INSERT INTO meal (meal_name, price, cost, preparation_time, calories, nutrients, date_added, diet_preference_id, ingredient_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
