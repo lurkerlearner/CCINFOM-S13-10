@@ -21,7 +21,7 @@ public class DietPreferencePanel extends JPanel
     private JPanel searchPanel;
     
     // Components for adding Diet Preferences
-    private JTextField dietID; // To show the ID is irrelevant for adding (auto-increment)
+    private JTextField dietID; 
     private JTextField dietNameField;
     private JTextField descriptionField;
     private JButton addButton;
@@ -31,7 +31,7 @@ public class DietPreferencePanel extends JPanel
     private DefaultTableModel tableModel;
     private JButton refreshButton;
     private JButton detailsButton;
-    private JButton deleteButton; // Added Delete button for comprehensive CRUD
+    private JButton deleteButton; 
     
     // Components for searching Diet Preferences
     private JComboBox<String> searchTypeComboBox;
@@ -65,7 +65,6 @@ public class DietPreferencePanel extends JPanel
         add(tabbedPane, BorderLayout.CENTER);
     }
     
-    // --- 1. Create the panel for adding a Diet Preference record ---
     private void createAddPanel() 
     {
         addPanel = new JPanel();
@@ -81,31 +80,29 @@ public class DietPreferencePanel extends JPanel
         
         // Fields based on DietPreference POJO
         dietID = new JTextField(5); 
-        dietID.setEditable(false); // ID is auto-incremented, so disable editing
+        dietID.setEditable(false); 
         dietNameField = new JTextField(25); 
         descriptionField = new JTextField(35); 
         
         int row = 0;
         
-        // Diet ID (For display/reference only)
+
         gbc.gridx = 0; gbc.gridy = row++;
         formPanel.add(new JLabel("Diet ID (Auto-Generated):"), gbc);
         gbc.gridx = 1;
         formPanel.add(dietID, gbc);
 
-        // Diet Name (Required for uniqueness check)
+ 
         gbc.gridx = 0; gbc.gridy = row++;
         formPanel.add(new JLabel("Diet Name:"), gbc);
         gbc.gridx = 1;
         formPanel.add(dietNameField, gbc);
 
-        // Description
         gbc.gridx = 0; gbc.gridy = row++;
         formPanel.add(new JLabel("Description:"), gbc);
         gbc.gridx = 1;
         formPanel.add(descriptionField, gbc);
         
-        // Create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
@@ -117,15 +114,14 @@ public class DietPreferencePanel extends JPanel
         addPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
         addPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
-    
-    // --- 2. Create the panel for viewing all Diet Preferences ---
+
     private void createViewPanel() 
     {
         viewPanel = new JPanel();
         viewPanel.setLayout(new BorderLayout());
         viewPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // Column names matching the POJO
+
         String[] columnNames = {"ID", "Diet Name", "Description"};
 
         tableModel = new DefaultTableModel(columnNames, 0) 
@@ -133,7 +129,7 @@ public class DietPreferencePanel extends JPanel
             @Override
             public boolean isCellEditable(int row, int column) 
             {
-                // Allow editing of Diet Name and Description directly in the table
+
                 return column > 0; 
             }
         };
@@ -142,7 +138,7 @@ public class DietPreferencePanel extends JPanel
         dietTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dietTable.getTableHeader().setReorderingAllowed(false);
         
-        // Add a listener for cell edits to handle updates
+
         tableModel.addTableModelListener(e -> {
             if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
                 int row = e.getFirstRow();
@@ -150,7 +146,7 @@ public class DietPreferencePanel extends JPanel
             }
         });
         
-        // Create button panel
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
@@ -169,19 +165,18 @@ public class DietPreferencePanel extends JPanel
         
         viewPanel.add(new JScrollPane(dietTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        // Populate the table on load
+
         refreshDietTable();
     }
     
-    // --- 3. Create the panel for searching Diet Preferences ---
+
     private void createSearchPanel() 
     {
         searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout());
         searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // Create search panel
+
         JPanel searchControls = new JPanel();
         searchControls.setLayout(new FlowLayout(FlowLayout.LEFT));
         
@@ -211,7 +206,7 @@ public class DietPreferencePanel extends JPanel
         searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         searchResultTable.getTableHeader().setReorderingAllowed(false);
         
-        // Create button for details
+ 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         
@@ -219,14 +214,13 @@ public class DietPreferencePanel extends JPanel
         detailsButton.addActionListener(e -> showDietDetails(searchResultTable, searchTableModel));
         
         buttonPanel.add(detailsButton);
-        
-        // Add components to the panel
+
         searchPanel.add(searchControls, BorderLayout.NORTH);
         searchPanel.add(new JScrollPane(searchResultTable), BorderLayout.CENTER);
         searchPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    // --- 4. Logic Implementation (CRUD Operations) ---
+
     
     private void addDietPreference() 
     {
@@ -240,8 +234,7 @@ public class DietPreferencePanel extends JPanel
                                              "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
-            // ID is 0 or -1 as it is auto-generated by the DB (model doesn't have a no-ID constructor)
+
             DietPreference newPref = new DietPreference(0, name, description);
 
             if (controller.createNewDietPreference(newPref)) {
@@ -270,19 +263,18 @@ public class DietPreferencePanel extends JPanel
             DietPreference updatedPref = new DietPreference(id, newName, newDescription);
             
             if (controller.updateDietPreference(updatedPref)) {
-                // Success is handled silently, maybe just a log or brief success message
-                // System.out.println("Update successful for ID: " + id);
+               
             } else {
-                // If update fails (e.g., uniqueness constraint violated in updateDietPreference)
+                
                 JOptionPane.showMessageDialog(this, "Update failed. Check if Diet Name is unique and not empty.",
                                              "Update Error", JOptionPane.ERROR_MESSAGE);
-                // Re-fetch data to revert the cell visually
+              
                 refreshDietTable();
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Invalid data or update error: " + e.getMessage(),
                                          "Error", JOptionPane.ERROR_MESSAGE);
-            refreshDietTable(); // Revert table state
+            refreshDietTable();
         }
     }
 
@@ -327,7 +319,7 @@ public class DietPreferencePanel extends JPanel
     {
         tableModel.setRowCount(0);
         
-        // Correct controller method: getAvailableDietPreferences()
+      
         List<DietPreference> allDiets = controller.getAvailableDietPreferences();
         
         for (DietPreference dp : allDiets) 
@@ -335,8 +327,8 @@ public class DietPreferencePanel extends JPanel
             Object[] row = new Object[] 
             {
                 dp.getDiet_preference_id(), 
-                dp.getDiet_name(), // Correct getter
-                dp.getDescription() // Correct getter
+                dp.getDiet_name(), 
+                dp.getDescription()
             };
 
             tableModel.addRow(row);
@@ -356,7 +348,7 @@ public class DietPreferencePanel extends JPanel
         
         int dietID = (int) model.getValueAt(selectedRow, 0);
         
-        // Correct controller method: getPreferenceDetails(id)
+     
         DietPreference diet = controller.getPreferenceDetails(dietID); 
         
         if (diet != null) {
@@ -400,21 +392,19 @@ public class DietPreferencePanel extends JPanel
                 case "By ID":
                     if (!query.isEmpty()) {
                         int id = Integer.parseInt(query);
-                        // Correct controller method: getPreferenceDetails(id)
                         singleResult = controller.getPreferenceDetails(id);
                     }
                     break;
 
                 case "By Name":
-                    // Correct controller method: getPreferenceByName(name)
                     singleResult = controller.getPreferenceByName(query);
                     break;
 
                 default:
-                    return; // Should not happen
+                    return; 
             }
             
-            // Handle single results retrieved from search methods
+
             if (singleResult != null) {
                  results.add(singleResult);
             }
@@ -432,7 +422,6 @@ public class DietPreferencePanel extends JPanel
              return;
         }
         
-        // Populate the table with search results
         for (DietPreference dp : results) 
         {
             Object[] row = new Object[] 
