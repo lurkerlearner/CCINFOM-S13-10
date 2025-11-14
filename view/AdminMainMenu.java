@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.EventQueue;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -52,7 +51,6 @@ public class AdminMainMenu extends JFrame {
         centerPanel.add(dateLabel);
         centerPanel.add(Box.createVerticalStrut(10));
 
-        //==PLACEHOLDER BUTTONS PANG ORDER AND DELIVERY AND VIEW SHIT
         JButton manageRecordsBtn = new JButton("Manage records");
         JButton makeTransactionBtn = new JButton("Make a transaction");
         JButton generateReportBtn = new JButton("Generate a report");

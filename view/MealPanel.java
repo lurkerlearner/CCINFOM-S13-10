@@ -1,5 +1,8 @@
 package view;
 
+import java.awt.*;
+import javax.swing.*;
+
 import java.awt.GridBagConstraints;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
