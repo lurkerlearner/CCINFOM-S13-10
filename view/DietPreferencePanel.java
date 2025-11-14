@@ -39,7 +39,7 @@ public class DietPreferencePanel extends JPanel
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
 
-    public DietPanel(DietPreferenceController controller) 
+    public DietPreferencePanel(DietPreferenceController controller) 
     {
         this.controller = controller;
         
