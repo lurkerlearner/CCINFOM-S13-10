@@ -511,15 +511,15 @@ public class FloodDataDAO
             String sql = """
                 SELECT AVG(
                     CASE 
-                        WHEN FloodFactor = 'LOW' THEN 1
-                        WHEN FloodFactor = 'MODERATE' THEN 2
-                        WHEN FloodFactor = 'HIGH' THEN 3
-                        WHEN FloodFactor = 'SEVERE' THEN 4
+                        WHEN flood_factor = 'LOW' THEN 1
+                        WHEN flood_factor = 'MODERATE' THEN 2
+                        WHEN flood_factor = 'HIGH' THEN 3
+                        WHEN flood_factor = 'SEVERE' THEN 4
                         ELSE NULL
                     END
                 ) AS avgFactor
                 FROM flood_data
-                WHERE LocationID = ?
+                WHERE location_id = ?
             """;
 
             PreparedStatement stmt = c.prepareStatement(sql);
@@ -707,4 +707,5 @@ public class FloodDataDAO
         return rank;
     }  
 }
+
 
