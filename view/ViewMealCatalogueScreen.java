@@ -99,16 +99,20 @@ private void createSearchFilterPanel(JPanel parentPanel){
     controlPanel.add(Box.createVerticalStrut(20));
 
     controlPanel.add(new JLabel("Filter By Diet Preference: "));
-    filterComboBox = new JComboBox<>(new String[]{"All", "Vegetarian", "Vegan", "Gluten-Free", "Keto", "High Protein", "Diabetic-Friendly" +
-                                     "Low Fat", "Low Sodium", "Mediterranean", "Paleo"});
+    filterComboBox = new JComboBox<>(new String[]{"All", "Vegetarian", "Vegan", "Gluten-Free", "Keto", "High Protein", "Diabetic-Friendly" 
+                                     ,"Low Fat", "Low Sodium", "Mediterranean", "Paleo"});
     controlPanel.add(filterComboBox);
     controlPanel.add(Box.createVerticalStrut(20));
 
  
     JButton applyButton = new JButton("Apply Changes");
     applyButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+    applyButton.setMaximumSize(new Dimension(150, applyButton.getPreferredSize().height));
     applyButton.setBackground(new Color(220, 31, 127)); 
     applyButton.setForeground(Color.WHITE);
+    applyButton.setOpaque(true);
+    applyButton.setContentAreaFilled(true);
+    applyButton.setFocusPainted(true);
     applyButton.setFont(new Font("Arial", Font.BOLD, 14));
     
 
