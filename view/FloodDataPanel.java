@@ -331,9 +331,9 @@ public class FloodDataPanel extends JPanel
                 f.getFloodFactor(),
                 f.getAvgWaterLevel(),
                 f.getAffectedHouseholds(),
-                f.getRoadCondition(),
+                f.getRoadCondition().getDbValue(),
                 f.getSpecialPackaging(),
-                f.getAltDeliveryMethod(),
+                f.getAltDeliveryMethod().getDbValue(),
                 f.getLocationID()
             };
 
@@ -438,9 +438,9 @@ public class FloodDataPanel extends JPanel
                 f.getFloodFactor(),
                 f.getAvgWaterLevel(),
                 f.getAffectedHouseholds(),
-                f.getRoadCondition(),
+                f.getRoadCondition().getDbValue(),
                 f.getSpecialPackaging(),
-                f.getAltDeliveryMethod(),
+                f.getAltDeliveryMethod().getDbValue(),
                 f.getLocationID()
             };
 
@@ -484,3 +484,4 @@ public class FloodDataPanel extends JPanel
     }
 
 }
+
