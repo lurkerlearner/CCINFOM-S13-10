@@ -256,7 +256,7 @@ public class DeliveryController
         d.setPaymentMode(pm);
         d.setPaymentStatus(PaymentStatus.PENDING);
         d.setDeliveryMethod(DeliveryMethod.MOTORCYCLE);
-        d.setDeliveryStatus(null);
+        d.setDeliveryStatus(DeliveryStatus.ON_TIME); //default
         d.setClientID(clientID);
         d.setMealID(mealID);
         d.setRiderID(riderDAO.getRandomRiderID());
@@ -295,5 +295,6 @@ public class DeliveryController
 
 
 // junction tables pa
+
 
 
