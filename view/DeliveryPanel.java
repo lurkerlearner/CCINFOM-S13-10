@@ -386,10 +386,10 @@ public class DeliveryPanel extends JPanel
                 d.getOrderDate(),
                 d.getTimeOrdered(),
                 d.getTimeDelivered(),
-                d.getPaymentMode(),
-                d.getPaymentStatus(),
-                d.getDeliveryMethod(),
-                d.getDeliveryStatus(),
+                d.getPaymentMode().getDbValue(),
+                d.getPaymentStatus().getDbValue(),
+                d.getDeliveryMethod().getDbValue(),
+                d.getDeliveryStatus().getDbValue(),
                 d.getClientID(),
                 d.getMealID(),
                 d.getRiderID()
@@ -506,10 +506,10 @@ public class DeliveryPanel extends JPanel
                 d.getOrderDate(),
                 d.getTimeOrdered(),
                 d.getTimeDelivered(),
-                d.getPaymentMode(),
-                d.getPaymentStatus(),
-                d.getDeliveryMethod(),
-                d.getDeliveryStatus(),
+                d.getPaymentMode().getDbValue(),
+                d.getPaymentStatus().getDbValue(),
+                d.getDeliveryMethod().getDbValue(),
+                d.getDeliveryStatus().getDbValue(),
                 d.getClientID(),
                 d.getMealID(),
                 d.getRiderID()
@@ -553,4 +553,5 @@ public class DeliveryPanel extends JPanel
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
 }
