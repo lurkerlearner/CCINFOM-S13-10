@@ -8,28 +8,41 @@ import controller.MealController;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import view.ViewMealCatalogueScreen;
-import DAO.MealIngredientDAO;
-import DAO.IngredientDAO;
-import DAO.DietPreferenceDAO;
+import DAO.*;
 
 
 public class ClientMainMenu extends JFrame {
 
     private Client client;
     private Location location;
-    private DAO.MealIngredientDAO mealIngredientDAO;
-    private DAO.IngredientDAO ingredientDAO;
-    private DAO.LocationDAO locationDAO;
-    private DAO.DietPreferenceDAO dietPreferenceDAO;
+    
+    private MealIngredientDAO mealIngredientDAO;
+    private IngredientDAO ingredientDAO;
+    private LocationDAO locationDAO;
+    private DietPreferenceDAO dietPreferenceDAO;
+    private DeliveryDAO delDAO;
+    private ClientDAO cDAO;
+    private MealDAO mDAO;
+    private MealDeliveryDAO mdDAO;
+    private FloodDataDAO fdDAO;
+    private RiderDAO rDAO;
+
+    private DeliveryController dc;
 
     public ClientMainMenu(Client client, Location location) {
         this.client = client;
         this.location = location;
 
-        this.mealIngredientDAO = new DAO.MealIngredientDAO();
-        this.ingredientDAO = new DAO.IngredientDAO();
-        this.locationDAO = new DAO.LocationDAO();
-        this.dietPreferenceDAO = new DAO.DietPreferenceDAO();
+        this.mealIngredientDAO = new MealIngredientDAO();
+        this.ingredientDAO = new IngredientDAO();
+        this.locationDAO = new LocationDAO();
+        this.dietPreferenceDAO = new DietPreferenceDAO();
+        this.delDAO = new DeliveryDAO(DBConnection.getConnection());
+        this.cDAO = new ClientDAO();
+        this.mDAO = new MealDAO();
+        this.mdDAO = new MealDeliveryDAO(DBConnection.getConnection());
+        this.fdDAO = new FloodDataDAO(DBConnection.getConnection());
+        this.rDAO = new RiderDAO(DBConnection.getConnection());
 
         setTitle("FloodPanda - Client Main Menu");
         setSize(800, 600);
@@ -139,8 +152,9 @@ public class ClientMainMenu extends JFrame {
 
 
         orderNowBtn.addActionListener(e -> {
-            // TODO: implement whatever
-            JOptionPane.showMessageDialog(this, "Order Now clicked."); // just to test if button works
+            this.dispose();
+            //JOptionPane.showMessageDialog(this, "Order Now clicked."); 
+            new OrderScreen(client, dc, delDAO, cDAO, mDAO, mdDAO, fdDAO, rDAO, locationDAO).setVisible(true); // Rahnee
         });
 
 
