@@ -20,6 +20,7 @@ public enum DeliveryStatus
 
     public static DeliveryStatus fromDbValue(String dbVal) 
     {
-        return valueOf(dbVal.toUpperCase().replace(" ", "_"));
+        return valueOf(dbVal.toUpperCase().replace("-", "_"));
     }
+
 }
