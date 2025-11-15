@@ -126,6 +126,14 @@ public List<Meal> getFilteredAndSortedMeals(String searchTerm, String sortOrder,
             return "FAILURE: Database error occurred while adding the meal record.";
         }
     }
+
+    public List<Meal> getFilteredMeals(int dietPreferenceId) {
+        if (dietPreferenceId <= 0) {
+            return mealDAO.getAllMeals();
+        } else {
+            return mealDAO.getMealsByDietPreference(dietPreferenceId);
+        }
+    }
     
     public List<Meal> getMealsForClient(int clientId) {
         List<Meal> meals = mealDAO.getMealsForClient(clientId);
