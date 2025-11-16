@@ -13,7 +13,7 @@ public class MealIngredientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
-
+            
             stmt.setInt(1, mealIngredient.getMeal_id());
             stmt.setInt(2, mealIngredient.getIngredient_id());
             stmt.setDouble(3, mealIngredient.getQuantity());
