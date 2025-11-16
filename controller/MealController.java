@@ -151,7 +151,7 @@ public String updateMeal(int mealId, String name, float price, float cost, int p
     if (mealDAO.updateMeal(updatedMeal)) {
         return "SUCCESS";
     } else {
-        return "Failed to update meal in database.";
+        return "Failed to update meal in database."; 
     }
 }
 

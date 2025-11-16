@@ -16,7 +16,7 @@ public List<Meal> getMealsInPlan(int mealPlanId) {
         String query = "SELECT m.meal_id, m.meal_name, m.price, m.cost, m.preparation_time, m.calories, m.nutrients, m.date_added, m.diet_preference_id " +
                        "FROM meal m " +
                        "JOIN meal_meal_plan mmp ON m.meal_id = mmp.meal_id " +
-                       "WHERE mmp.meal_plan_id = ?";
+                       "WHERE mmp.plan_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -116,7 +116,25 @@ public List<Meal> getMealsInPlan(int mealPlanId) {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating diet preference: " + e.getMessage());
+            System.err.println("Error updating Meal Plan price: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updatePlanTotalPrice(MealPlan plan) {
+        String query = "UPDATE meal_plan SET total_price = ? WHERE plan_id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setFloat(1, plan.getTotal_price());
+            preparedStatement.setInt(2, plan.getPlan_id());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error updating plan total price: " + e.getMessage());
             return false;
         }
     }

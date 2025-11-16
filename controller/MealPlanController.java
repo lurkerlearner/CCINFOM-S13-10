@@ -2,7 +2,9 @@ package controller;
 
 import model.Meal;
 import model.MealPlan;
+import DAO.MealDAO;
 import DAO.MealPlanDAO;
+import DAO.MealMealPlanDAO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,27 +13,60 @@ import java.util.List;
 public class MealPlanController {
 
     private final MealPlanDAO mealPlanDAO;
+    private final MealMealPlanDAO mealMealPlanDAO;
+    private final MealDAO mealDAO;
 
     public MealPlanController() {
         this.mealPlanDAO = new MealPlanDAO();
+        this.mealMealPlanDAO = new MealMealPlanDAO();
+        this.mealDAO = new MealDAO();
     }
 
     public List<MealPlan> getAllMealPlans() {
+
         return mealPlanDAO.getallMealPlans();
     }
+
     public MealPlan getMealPlanDetails(int id) {
+       
         if (id <= 0) {
             System.err.println("Validation Error: Invalid plan id.");
             return null;
         }
+
         return mealPlanDAO.getMealPlanbyId(id);
     }
+
     public MealPlan getPlanByName(String name){
         return mealPlanDAO.getMealPlanByName(name);
     }
+
     public MealPlanDAO getMealPlanDAO() {
         return mealPlanDAO;
     }
+
+    public List<Meal> getAllMeals(){
+        return mealDAO.getAllMeals();
+    }
+
+    public boolean addMealtoPlan(int mealId, int planId){
+        if(mealId <= 0 || planId <=0){
+            System.err.println("Validation Error: Invalid meal or plan id.");
+            return false;
+        }
+        if (mealMealPlanDAO.addMealToPlan(mealId, planId)) {
+            Meal meal = mealDAO.getMealById(mealId);
+            MealPlan plan = mealPlanDAO.getMealPlanbyId(planId);
+            
+            if (meal !=null && plan != null) {
+                float newTotalPrice = plan.getTotal_price() + meal.getPrice();
+                plan.setTotal_price(newTotalPrice);
+                return mealPlanDAO.updatePlanTotalPrice(plan);
+            }
+        }
+        return false;
+    }
+
     public boolean createNewMealPlan(MealPlan plan) {
         if (plan == null || plan.getPlan_name() == null || plan.getPlan_name().trim().isEmpty()) {
             System.err.println("Validation Error: Plan name cannot be empty.");
@@ -53,6 +88,14 @@ public class MealPlanController {
         return mealPlanDAO.getMealsInPlan(planId);
     }
 
+    public boolean removeMealFromPlan(int mealId, int planId){
+        if (mealId<=0 || planId <= 0) {
+            System.err.println("Validation Error: Invalid meal or plan id for removal.");
+            return false;
+        }
+        return mealMealPlanDAO.removeMealFromPlan(mealId, planId);
+    }
+
 
     public String updateMealPlan(int id, String name, String description, float total_price) {    if (name == null || name.trim().isEmpty()) {
         return "FAILURE: Plan name cannot be empty.";
@@ -70,5 +113,14 @@ public class MealPlanController {
     } else {
         return "Failed to update plan in database.";
     }
+    }
+    public boolean deleteMealPlan(int planId) {
+        MealPlan existing = mealPlanDAO.getMealPlanbyId(planId);
+        if (existing == null) {
+            System.err.println("Validation Error: Meal plan not found.");
+            return false;
+        }
+        mealMealPlanDAO.deleteByMealPlanId(planId);
+        return mealPlanDAO.deleteMealPlan(planId);
     }
 }

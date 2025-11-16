@@ -11,7 +11,7 @@ import java.util.List;
 public class MealMealPlanDAO {
 
     public boolean addMealToPlan(int mealId, int mealPlanId) {
-        String query = "INSERT INTO meal_meal_plan (meal_id, meal_plan_id) VALUES (?, ?)";
+        String query = "INSERT INTO meal_meal_plan (meal_id, plan_id) VALUES (?, ?)";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -25,11 +25,26 @@ public class MealMealPlanDAO {
             return false;
         }
     }
+    public boolean removeMealFromPlan(int mealId, int mealPlanId) {
+        String query = "DELETE FROM meal_meal_plan WHERE meal_id = ? AND plan_id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, mealId);
+            preparedStatement.setInt(2, mealPlanId);
+
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error removing meal " + mealId + " from plan " + mealPlanId + ": " + e.getMessage());
+            return false;
+        }
+    }
 
 
     public List<Integer> getMealIdsByPlan(int mealPlanId) {
         List<Integer> mealIds = new ArrayList<>();
-        String query = "SELECT meal_id FROM meal_meal_plan WHERE meal_plan_id = ?";
+        String query = "SELECT meal_id FROM meal_meal_plan WHERE plan_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -49,7 +64,7 @@ public class MealMealPlanDAO {
 
 
     public boolean deleteByMealPlanId(int mealPlanId) {
-        String query = "DELETE FROM meal_meal_plan WHERE meal_plan_id = ?";
+        String query = "DELETE FROM meal_meal_plan WHERE plan_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -80,4 +95,5 @@ public class MealMealPlanDAO {
             return true; 
         }
     }
+
 }
