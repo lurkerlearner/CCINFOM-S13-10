@@ -307,7 +307,7 @@ public class MealPanel  extends JPanel {
                 int column = e.getColumn();
 
                 if (column != 0) {
-                    updateMealTable(tableModel, row, column);
+                    updateMealTable(searchTableModel, row, column);
                 }
             }
         }); 

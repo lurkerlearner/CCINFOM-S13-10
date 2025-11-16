@@ -235,7 +235,7 @@ public class MealPlanPanel extends JPanel
                 int column = e.getColumn();
 
                 if (column != 0) {
-                    updateMealPlanFromTable(tableModel, row, column);
+                    updateMealPlanFromTable(searchTableModel, row, column);
                 }
             }
         });     
@@ -306,12 +306,18 @@ public class MealPlanPanel extends JPanel
     private void updateMealPlanFromTable(DefaultTableModel model, int row, int column) 
     {
         try {
-            int id = (int) tableModel.getValueAt(row, 0);
-            String newName = (String)tableModel.getValueAt(row, 1).toString();
-            String newDescription = (String)tableModel.getValueAt(row, 2).toString();
-            float cost = Float.parseFloat(tableModel.getValueAt(row, 3).toString());
-            
+            int id = Integer.parseInt(model.getValueAt(row, 0).toString());
+            String newName = (String)model.getValueAt(row, 1).toString();
+            String newDescription = (String)model.getValueAt(row, 2).toString();
+            float cost = Float.parseFloat(model.getValueAt(row, 3).toString());
             String result = controller.updateMealPlan(id, newName, newDescription, cost);
+            
+            if (newName.trim().isEmpty()) {
+             JOptionPane.showMessageDialog(this, "Plan Name cannot be empty.",
+                 "Validation Error", JOptionPane.ERROR_MESSAGE);
+             refreshPlanTable(); 
+             return;
+        }
             if ("SUCCESS".equals(result)) {
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update Plan ID " + id + ": " + result, "Database Error", JOptionPane.ERROR_MESSAGE);

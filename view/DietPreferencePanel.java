@@ -220,7 +220,7 @@ public class DietPreferencePanel extends JPanel
                 int column = e.getColumn();
 
                 if (column != 0) {
-                    updateDietPreferenceTable(tableModel, row, column);
+                    updateDietPreferenceTable(searchTableModel, row, column);
                 }
             }
         }); 
@@ -277,9 +277,9 @@ public class DietPreferencePanel extends JPanel
     private void updateDietPreferenceTable(DefaultTableModel model, int row, int column) 
     {
         try {
-            int id = (int) tableModel.getValueAt(row, 0);
-            String newName = (String) tableModel.getValueAt(row, 1).toString();
-            String newDescription = (String) tableModel.getValueAt(row, 2).toString();
+            int id = Integer.parseInt(model.getValueAt(row, 0).toString());
+            String newName = (String) model.getValueAt(row, 1).toString();
+            String newDescription = (String) model.getValueAt(row, 2).toString();
             String result = controller.updateDietPreference(id, newName, newDescription);
             
             if ("SUCCESS".equals(result)) {

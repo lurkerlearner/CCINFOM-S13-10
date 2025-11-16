@@ -54,9 +54,18 @@ public class MealPlanController {
     }
 
 
-    public String updateMealPlan(int id, String name, String description, float total_price) {
-        MealPlan updatedPlan = new MealPlan(id, name, description, total_price);
-    if (mealPlanDAO.updateMealPlan(updatedPlan)) {
+    public String updateMealPlan(int id, String name, String description, float total_price) {    if (name == null || name.trim().isEmpty()) {
+        return "FAILURE: Plan name cannot be empty.";
+    }
+    if (total_price < 0) {
+        return "FAILURE: Total price cannot be negative.";
+    }
+        MealPlan existing = mealPlanDAO.getMealPlanByName(name);
+        if (existing!=null && existing.getPlan_id() !=id) {
+            return "FAILURE: Plan name must be unique.";
+        }
+    MealPlan updatedPlan = new MealPlan(id, name, description, total_price);
+        if (mealPlanDAO.updateMealPlan(updatedPlan)) {
         return "SUCCESS";
     } else {
         return "Failed to update plan in database.";
