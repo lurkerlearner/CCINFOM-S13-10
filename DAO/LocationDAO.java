@@ -90,7 +90,7 @@ public class LocationDAO {
         return locations;
     }
 
-    public List<Location> searchLocations(String type, String value) {
+    public List<Location> searchLocations(String type, Object value) {
         List<Location> locations = new ArrayList<>();
         String sql;
 
@@ -115,7 +115,7 @@ public class LocationDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             if(type.equals("id")) {
-                ps.setInt(1, Integer.parseInt(value));
+                ps.setInt(1, (int)value);
             } else {
                 ps.setString(1, "%" + value + "%");
             }

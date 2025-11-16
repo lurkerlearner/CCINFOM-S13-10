@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; // Added for list filtering
 
 public class MealPlanPanel extends JPanel 
 {
@@ -21,6 +22,16 @@ public class MealPlanPanel extends JPanel
     private JPanel addPanel;
     private JPanel viewPanel;
     private JPanel searchPanel;
+    
+    // --- Meal Management Components (NEW TAB CONTENT) ---
+    private JPanel manageMealsTab;
+    private JTable availableMealsTable;
+    private JTable currentMealsTable;
+    private DefaultTableModel availableMealsModel;
+    private DefaultTableModel currentMealsModel;
+    private JLabel manageMealsTitleLabel;
+    private MealPlan currentPlanForManagement; // Holds the plan being edited
+    // ---------------------------------------------------
     
     // Components for adding Meal Plans
     private JTextField planID; 
@@ -35,6 +46,7 @@ public class MealPlanPanel extends JPanel
     private JButton refreshButton;
     private JButton detailsButton;
     private JButton deleteButton; 
+    private JButton manageMealsButton; // Renamed to editMealsButton in implementation
     
     // Components for searching Meal Plans
     private JComboBox<String> searchTypeComboBox;
@@ -63,10 +75,15 @@ public class MealPlanPanel extends JPanel
         createAddPanel();
         createViewPanel();
         createSearchPanel();
+        createManageMealsPanel(); // <-- NEW: Create the fourth tab content
         
         tabbedPane.addTab("Add Meal Plan", addPanel);
         tabbedPane.addTab("View All / Modify", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
+        tabbedPane.addTab("Manage Meals", manageMealsTab); // <-- NEW: Add the fourth tab
+        
+        // Initially disable the Manage Meals tab until a plan is selected
+        tabbedPane.setEnabledAt(3, false); 
         
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -124,8 +141,12 @@ public class MealPlanPanel extends JPanel
         
         mainMenuButton = new JButton("Return to Main Menu");
         mainMenuButton.addActionListener(e -> {
-            SwingUtilities.getWindowAncestor(this).dispose();
-            new AdminMainMenu().setVisible(true);
+            // Placeholder: Assume AdminMainMenu exists
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window != null) {
+                window.dispose();
+            }
+            // new AdminMainMenu().setVisible(true); // Uncomment if AdminMainMenu class is available
         });
         addButton = new JButton("Add Meal Plan");
         addButton.addActionListener(e -> addMealPlan());
@@ -137,7 +158,7 @@ public class MealPlanPanel extends JPanel
         addPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    // --- 2. Create the panel for viewing all Meal Plans ---
+    // --- 2. Create the panel for viewing all Meal Plans (Updated) ---
     private void createViewPanel() 
     {
         viewPanel = new JPanel();
@@ -152,7 +173,6 @@ public class MealPlanPanel extends JPanel
             @Override
             public boolean isCellEditable(int row, int column) 
             {
-               
                 return column > 0; 
             }
         };
@@ -161,7 +181,6 @@ public class MealPlanPanel extends JPanel
         planTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         planTable.getTableHeader().setReorderingAllowed(false);
         
-
         tableModel.addTableModelListener(e -> {
             if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
                 int row = e.getFirstRow();
@@ -179,12 +198,17 @@ public class MealPlanPanel extends JPanel
         
         detailsButton = new JButton("View Details");
         detailsButton.addActionListener(e -> showPlanDetails(planTable, tableModel));
+
+        // NEW BUTTON: Edit Meals (switches to the new tab)
+        JButton editMealsButton = new JButton("Edit Meals");
+        editMealsButton.addActionListener(e -> goToManageMealsTab());
         
         deleteButton = new JButton("Delete Selected");
         deleteButton.addActionListener(e -> deleteMealPlan());
         
         buttonPanel.add(refreshButton);
         buttonPanel.add(detailsButton);
+        buttonPanel.add(editMealsButton); // <-- ADDED EDIT MEALS BUTTON
         buttonPanel.add(deleteButton);
         
         viewPanel.add(new JScrollPane(planTable), BorderLayout.CENTER);
@@ -238,7 +262,7 @@ public class MealPlanPanel extends JPanel
                     updateMealPlanFromTable(searchTableModel, row, column);
                 }
             }
-        });     
+        }); 
 
         searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         searchResultTable.getTableHeader().setReorderingAllowed(false);
@@ -258,7 +282,68 @@ public class MealPlanPanel extends JPanel
         searchPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
     
-    // --- 4. Logic Implementation (CRUD Operations) ---
+    // --- 4. NEW: Create the dedicated management tab content (Fourth Tab) ---
+    private void createManageMealsPanel() {
+        manageMealsTab = new JPanel(new BorderLayout(10, 10));
+        
+        // --- North Panel: Title ---
+        JPanel northPanel = new JPanel(new BorderLayout());
+        manageMealsTitleLabel = new JLabel("Please select a Meal Plan from 'View All / Modify' tab.", JLabel.CENTER);
+        manageMealsTitleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        northPanel.add(manageMealsTitleLabel, BorderLayout.CENTER);
+        manageMealsTab.add(northPanel, BorderLayout.NORTH);
+
+        // --- Tables Initialization ---
+        String[] mealColumns = {"ID", "Name", "Price"};
+        
+        availableMealsModel = new DefaultTableModel(mealColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        availableMealsTable = new JTable(availableMealsModel);
+        availableMealsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        currentMealsModel = new DefaultTableModel(mealColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        currentMealsTable = new JTable(currentMealsModel);
+        currentMealsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // --- Button Panel (Center Controls) ---
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 5, 5));
+        JButton addButton = new JButton("<< Add Meal");
+        JButton removeButton = new JButton("Remove Meal >>");
+
+        addButton.addActionListener(e -> addMealToPlan());
+        removeButton.addActionListener(e -> removeMealFromPlan());
+        
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        
+        // --- Main Content Split Pane ---
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setResizeWeight(0.5);
+
+        JPanel availablePanel = new JPanel(new BorderLayout());
+        availablePanel.add(new JLabel("Available Meals (Not in Plan):", JLabel.CENTER), BorderLayout.NORTH);
+        availablePanel.add(new JScrollPane(availableMealsTable), BorderLayout.CENTER);
+        
+        JPanel currentPanel = new JPanel(new BorderLayout());
+        currentPanel.add(new JLabel("Meals in Current Plan:", JLabel.CENTER), BorderLayout.NORTH);
+        currentPanel.add(new JScrollPane(currentMealsTable), BorderLayout.CENTER);
+
+        splitPane.setLeftComponent(availablePanel);
+        splitPane.setRightComponent(currentPanel);
+
+        JPanel centerContent = new JPanel(new BorderLayout(10, 10));
+        centerContent.add(splitPane, BorderLayout.CENTER);
+        centerContent.add(buttonPanel, BorderLayout.EAST);
+        
+        manageMealsTab.add(centerContent, BorderLayout.CENTER);
+    }
+    
+    // --- 5. Logic Implementation (CRUD Operations & Management) ---
     
     private void addMealPlan() 
     {
@@ -314,29 +399,29 @@ public class MealPlanPanel extends JPanel
             
             if (newName.trim().isEmpty()) {
              JOptionPane.showMessageDialog(this, "Plan Name cannot be empty.",
-                 "Validation Error", JOptionPane.ERROR_MESSAGE);
+                   "Validation Error", JOptionPane.ERROR_MESSAGE);
              refreshPlanTable(); 
              return;
-        }
+            }
             if ("SUCCESS".equals(result)) {
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update Plan ID " + id + ": " + result, "Database Error", JOptionPane.ERROR_MESSAGE);
                 
-                if (tableModel == this.tableModel) {
+                if (model == this.tableModel) {
                      refreshPlanTable(); 
-                 } else {
+                   } else {
                      searchMealPlan(); 
-                 }
+                   }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Invalid data or update error: " + e.getMessage(),
                                          "Error", JOptionPane.ERROR_MESSAGE);
             
-            if (tableModel == this.tableModel) {
+            if (model == this.tableModel) {
                  refreshPlanTable(); 
-             } else {
+               } else {
                  searchMealPlan(); 
-             }           
+               } 
         }
     }
 
@@ -417,19 +502,18 @@ public class MealPlanPanel extends JPanel
         
         if (plan != null) {
             
-            // --- Logic to display Meals in Plan ---
-            // FIX: Use the new controller method getMealsForPlan(planID)
+            // 1. Fetch the meals for the selected plan using the Controller
             List<Meal> mealsInPlan = controller.getMealsForPlan(planID);
             
-            // 2. Build the detailed string/layout
-            StringBuilder mealDetails = new StringBuilder("Meals in this Plan:\n");
+            // 2. Build the meal details string
+            StringBuilder mealDetails = new StringBuilder("Meals in this Plan:\n\n");
             
             if (mealsInPlan.isEmpty()) {
-                mealDetails.append("  (No meals currently assigned to this plan.)");
+                mealDetails.append("  (No meals currently assigned to this plan.)");
             } else {
                 for (Meal meal : mealsInPlan) {
-                    // NOTE: Assumes Meal POJO methods based on DAO
-                    mealDetails.append(String.format("  - %s (ID: %d | Price: $%.2f | Calories: %d)\n",
+                    // Formats the meal data neatly
+                    mealDetails.append(String.format("  - %s (ID: %d)\n    Price: $%.2f | Calories: %d\n\n",
                         meal.getMeal_name(), 
                         meal.getMeal_id(), 
                         meal.getPrice(), 
@@ -438,8 +522,8 @@ public class MealPlanPanel extends JPanel
                 }
             }
             
-            // 3. Combine Plan Details and Meal Details into a single component
-            String planInfo = String.format("PLAN INFO:\nID: %d\nName: %s\nPrice: $%.2f\nDescription: %s\n\n",
+            // 3. Format Plan Details and combine with Meal Details
+            String planInfo = String.format("PLAN INFO:\n--------------------------------\nID: %d\nName: %s\nPrice: $%.2f\nDescription: %s\n\n",
                 plan.getPlan_id(),
                 plan.getPlan_name(),
                 plan.getTotal_price(),
@@ -450,10 +534,14 @@ public class MealPlanPanel extends JPanel
             textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             
             JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setPreferredSize(new Dimension(500, 300));
+            // Set a reasonable size for the dialog content
+            scrollPane.setPreferredSize(new Dimension(450, 350));
             
             JOptionPane.showMessageDialog(this, scrollPane, "Meal Plan Details (" + plan.getPlan_name() + ")", 
                                          JOptionPane.INFORMATION_MESSAGE);
+        } else {
+             JOptionPane.showMessageDialog(this, "Failed to retrieve plan details.",
+                                         "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -530,6 +618,108 @@ public class MealPlanPanel extends JPanel
         {
             JOptionPane.showMessageDialog(this, "No meal plans found matching the search criteria.",
                                          "No Results", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    // NEW METHOD: Switches to the Manage Meals tab and loads the selected plan
+    private void goToManageMealsTab() {
+        int selectedRow = planTable.getSelectedRow();
+        
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a meal plan to manage its meals.",
+                                         "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int planID = (int) tableModel.getValueAt(selectedRow, 0);
+        MealPlan plan = controller.getMealPlanDetails(planID); 
+        
+        if (plan != null) {
+            // 1. Store the plan currently being edited
+            this.currentPlanForManagement = plan;
+            
+            // 2. Update the UI content
+            manageMealsTitleLabel.setText("Managing Meals for Plan: " + plan.getPlan_name() + " (ID: " + plan.getPlan_id() + ")");
+            loadManageMealsTables(); 
+            
+            // 3. Enable the tab
+            tabbedPane.setEnabledAt(3, true); 
+            
+            // 4. Switch to the new tab (index 3)
+            tabbedPane.setSelectedIndex(3); 
+        } else {
+             JOptionPane.showMessageDialog(this, "Failed to load plan details.",
+                                         "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // NEW METHOD: Loads data into both Available and Current tables
+    private void loadManageMealsTables() {
+        if (currentPlanForManagement == null) return;
+        
+        // Clear models
+        availableMealsModel.setRowCount(0);
+        currentMealsModel.setRowCount(0);
+
+        // Fetch data via Controller (Requires controller to have getAllMeals())
+        List<Meal> allMeals = controller.getAllMeals(); 
+        List<Meal> mealsInPlan = controller.getMealsForPlan(currentPlanForManagement.getPlan_id());
+
+        // Get the IDs of meals currently in the plan for filtering
+        List<Integer> currentMealIds = mealsInPlan.stream()
+            .map(Meal::getMeal_id)
+            .collect(Collectors.toList());
+
+        // Populate the Current Meals Table
+        for (Meal meal : mealsInPlan) {
+            currentMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()});
+        }
+
+        // Populate the Available Meals Table (Only meals NOT in the plan)
+        for (Meal meal : allMeals) {
+            if (!currentMealIds.contains(meal.getMeal_id())) {
+                availableMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()});
+            }
+        }
+    }
+    
+    // NEW METHOD: Handles adding a selected meal
+    private void addMealToPlan() {
+        if (currentPlanForManagement == null) return;
+        int selectedRow = availableMealsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an available meal to add.");
+            return;
+        }
+
+        int mealId = (int) availableMealsModel.getValueAt(selectedRow, 0);
+
+        // Requires controller to have addMealToPlan(mealId, planId)
+        if (controller.addMealtoPlan(mealId, currentPlanForManagement.getPlan_id())) {
+            JOptionPane.showMessageDialog(this, "Meal added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadManageMealsTables(); // Reload tables to update the lists
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to add meal. It might already be in the plan.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // NEW METHOD: Handles removing a selected meal
+    private void removeMealFromPlan() {
+        if (currentPlanForManagement == null) return;
+        int selectedRow = currentMealsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a meal in the current plan to remove.");
+            return;
+        }
+
+        int mealId = (int) currentMealsModel.getValueAt(selectedRow, 0);
+
+        // Requires controller to have removeMealFromPlan(mealId, planId)
+        if (controller.removeMealFromPlan(mealId, currentPlanForManagement.getPlan_id())) {
+            JOptionPane.showMessageDialog(this, "Meal removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadManageMealsTables(); // Reload tables to update the lists
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to remove meal.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

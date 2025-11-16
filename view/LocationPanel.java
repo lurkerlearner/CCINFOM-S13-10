@@ -9,23 +9,26 @@ import java.awt.*;
 import java.util.List;
 
 public class LocationPanel extends JPanel {
+
     private LocationController controller;
 
     private JTabbedPane tabbedPane;
     private JPanel addPanel, viewPanel, searchPanel;
 
     private JTextField streetField, cityField, zipField;
-    private JButton addButton;
+    private JButton addLocationBtn;
+    private JButton refreshBtn;
 
     private JTable locationTable;
-    private DefaultTableModel tableModel;
+    private DefaultTableModel locationTableModel;
 
-    private JComboBox<String> searchTypeComboBox;
+    private JComboBox<String> searchTypeDropdown;
     private JTextField searchField;
-    private JTable searchResultTable;
+    private JTable searchTable;
     private DefaultTableModel searchTableModel;
+    private JButton searchBtn;
+    private JButton searchDetailsBtn;
 
-    // Button to go back to main menu
     private JButton mainMenuButton;
 
     public LocationPanel(LocationController controller) {
@@ -36,48 +39,119 @@ public class LocationPanel extends JPanel {
 
     private void initComponents() {
         tabbedPane = new JTabbedPane();
+
         createAddPanel();
         createViewPanel();
         createSearchPanel();
 
         tabbedPane.addTab("Add Location", addPanel);
-        tabbedPane.addTab("View All", viewPanel);
-        tabbedPane.addTab("Search", searchPanel);
+        tabbedPane.addTab("View Locations", viewPanel);
+        tabbedPane.addTab("Search Locations", searchPanel);
 
         add(tabbedPane, BorderLayout.CENTER);
     }
 
     private void createAddPanel() {
-        addPanel = new JPanel(new GridBagLayout());
+        addPanel = new JPanel(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(8, 8, 8, 8);
 
         streetField = new JTextField(20);
-        cityField = new JTextField(15);
-        zipField = new JTextField(10);
+        cityField = new JTextField(20);
+        zipField = new JTextField(20);
 
-        int y = 0;
-        gbc.gridx=0; gbc.gridy=y; addPanel.add(new JLabel("Street:"), gbc);
-        gbc.gridx=1; addPanel.add(streetField, gbc); y++;
+        int row = 0;
+        addField(formPanel, gbc, row++, "Street:", streetField);
+        addField(formPanel, gbc, row++, "City:", cityField);
+        addField(formPanel, gbc, row++, "ZIP Code:", zipField);
 
-        gbc.gridx=0; gbc.gridy=y; addPanel.add(new JLabel("City:"), gbc);
-        gbc.gridx=1; addPanel.add(cityField, gbc); y++;
-
-        gbc.gridx=0; gbc.gridy=y; addPanel.add(new JLabel("ZIP:"), gbc);
-        gbc.gridx=1; addPanel.add(zipField, gbc); y++;
-
-        addButton = new JButton("Add Location");
-        addButton.addActionListener(e -> addLocation());
-        gbc.gridx=1; gbc.gridy=y+1; addPanel.add(addButton, gbc);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         mainMenuButton = new JButton("Return to Main Menu");
         mainMenuButton.addActionListener(e -> {
             SwingUtilities.getWindowAncestor(this).dispose();
             new AdminMainMenu().setVisible(true);
         });
-        gbc.gridx=0; gbc.gridy=y+1; addPanel.add(mainMenuButton, gbc);
 
+        addLocationBtn = new JButton("Add Location");
+        addLocationBtn.addActionListener(e -> addLocation());
+
+        buttonPanel.add(mainMenuButton);
+        buttonPanel.add(addLocationBtn);
+
+        addPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+        addPanel.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+    }
+
+    private void createViewPanel() {
+        viewPanel = new JPanel(new BorderLayout());
+        viewPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        locationTableModel = new DefaultTableModel(new String[]{
+                "Location ID", "Street", "City", "ZIP"
+        }, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        locationTable = new JTable(locationTableModel);
+        locationTable.getTableHeader().setReorderingAllowed(false);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        refreshBtn = new JButton("Refresh");
+        refreshBtn.addActionListener(e -> refreshLocationTable());
+        buttonPanel.add(refreshBtn);
+
+        viewPanel.add(new JScrollPane(locationTable), BorderLayout.CENTER);
+        viewPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        refreshLocationTable();
+    }
+
+    private void createSearchPanel() {
+        searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchTypeDropdown = new JComboBox<>(new String[]{"By ID", "By Street", "By City", "By ZIP"});
+        searchField = new JTextField(20);
+        searchBtn = new JButton("Search");
+        searchBtn.addActionListener(e -> searchLocations());
+
+        top.add(new JLabel("Search:"));
+        top.add(searchTypeDropdown);
+        top.add(searchField);
+        top.add(searchBtn);
+
+        searchTableModel = new DefaultTableModel(new String[]{
+                "Location ID", "Street", "City", "ZIP"
+        }, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        searchTable = new JTable(searchTableModel);
+        searchTable.getTableHeader().setReorderingAllowed(false);
+
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        searchDetailsBtn = new JButton("View Details");
+        searchDetailsBtn.addActionListener(e -> showSearchDetails());
+        bottom.add(searchDetailsBtn);
+
+        searchPanel.add(top, BorderLayout.NORTH);
+        searchPanel.add(new JScrollPane(searchTable), BorderLayout.CENTER);
+        searchPanel.add(bottom, BorderLayout.SOUTH);
     }
 
     private void addLocation() {
@@ -100,69 +174,57 @@ public class LocationPanel extends JPanel {
         zipField.setText("");
     }
 
-    private void createViewPanel() {
-        viewPanel = new JPanel(new BorderLayout());
-        String[] columns = {"ID","Street","City","ZIP"};
-        tableModel = new DefaultTableModel(columns,0) {
-            @Override public boolean isCellEditable(int row, int col){return false;}
-        };
-        locationTable = new JTable(tableModel);
-        viewPanel.add(new JScrollPane(locationTable), BorderLayout.CENTER);
-
-        JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> refreshLocationTable());
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(refreshButton);
-        viewPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        refreshLocationTable();
-    }
-
     private void refreshLocationTable() {
-        tableModel.setRowCount(0);
+        locationTableModel.setRowCount(0);
         List<Location> locations = controller.getAllLocations();
         for(Location loc : locations) {
-            tableModel.addRow(new Object[]{loc.getLocationId(), loc.getStreet(), loc.getCity(), loc.getZip()});
+            locationTableModel.addRow(new Object[]{loc.getLocationId(), loc.getStreet(), loc.getCity(), loc.getZip()});
         }
-    }
-
-    private void createSearchPanel() {
-        searchPanel = new JPanel(new BorderLayout());
-        JPanel searchControls = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        searchTypeComboBox = new JComboBox<>(new String[]{"ID","Street","City","ZIP"});
-        searchField = new JTextField(20);
-        JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> searchLocations());
-
-        searchControls.add(new JLabel("Search by:"));
-        searchControls.add(searchTypeComboBox);
-        searchControls.add(searchField);
-        searchControls.add(searchButton);
-
-        searchPanel.add(searchControls, BorderLayout.NORTH);
-
-        String[] columns = {"ID","Street","City","ZIP"};
-        searchTableModel = new DefaultTableModel(columns,0){
-            @Override public boolean isCellEditable(int row,int col){return false;}
-        };
-        searchResultTable = new JTable(searchTableModel);
-        searchPanel.add(new JScrollPane(searchResultTable), BorderLayout.CENTER);
     }
 
     private void searchLocations() {
-        String type = ((String)searchTypeComboBox.getSelectedItem()).toLowerCase();
-        String value = searchField.getText().trim();
+        String type = searchTypeDropdown.getSelectedItem().toString().toLowerCase();
+        String query = searchField.getText().trim();
 
-        List<Location> results = controller.searchLocations(type, value);
+        List<Location> results;
         searchTableModel.setRowCount(0);
-        for(Location loc : results) {
-            searchTableModel.addRow(new Object[]{loc.getLocationId(), loc.getStreet(), loc.getCity(), loc.getZip()});
+
+        switch (searchTypeDropdown.getSelectedIndex()) {
+            case 0 -> results = controller.searchLocationById(query);
+            case 1 -> results = controller.searchLocationByStreet(query);
+            case 2 -> results = controller.searchLocationByCity(query);
+            case 3 -> results = controller.searchLocationByZip(query);
+            default -> {return;}
         }
 
-        if(results.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No locations found.", "No Results", JOptionPane.INFORMATION_MESSAGE);
+        for(Location loc : results) {
+            searchTableModel.addRow(new Object[]{
+                    loc.getLocationId(),
+                    loc.getStreet(),
+                    loc.getCity(),
+                    loc.getZip()});
         }
+
+    }
+
+    private void showSearchDetails() {
+        int row = searchTable.getSelectedRow();
+        if(row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a location.");
+            return;
+        }
+
+        String details =
+                "Location ID: " + searchTableModel.getValueAt(row, 0) + "\n" +
+                        "Street: " + searchTableModel.getValueAt(row, 1) + "\n" +
+                        "City: " + searchTableModel.getValueAt(row, 2) + "\n" +
+                        "ZIP: " + searchTableModel.getValueAt(row, 3);
+
+        JTextArea area = new JTextArea(details);
+        area.setEditable(false);
+        JScrollPane scroll = new JScrollPane(area);
+        scroll.setPreferredSize(new Dimension(400, 300));
+
+        JOptionPane.showMessageDialog(this, scroll, "Location Details", JOptionPane.INFORMATION_MESSAGE);
     }
 }
-
