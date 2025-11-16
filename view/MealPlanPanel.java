@@ -2,7 +2,7 @@ package view;
 
 import controller.MealPlanController;
 import model.MealPlan;
-import model.Meal; // ASSUMPTION: This class is available
+import model.Meal; 
 import DAO.MealPlanDAO; 
 
 import javax.swing.*;

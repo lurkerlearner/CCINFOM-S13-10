@@ -45,9 +45,16 @@ public class MealDetailsScreen extends JFrame {
         
         // Use the app's established pink/red styling
         Color appColor = new Color(220, 31, 127);
-        returnButton.setBackground(new Color(255, 182, 193)); 
-        returnButton.setForeground(appColor);
-        returnButton.setBorder(BorderFactory.createLineBorder(appColor, 2));
+
+         returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        returnButton.setMaximumSize(new Dimension(100, returnButton.getPreferredSize().height));
+        returnButton.setBackground(new Color(220, 31, 127)); 
+        returnButton.setForeground(Color.WHITE);
+        returnButton.setOpaque(true);
+        returnButton.setContentAreaFilled(true);
+        returnButton.setFocusPainted(true);
+        returnButton.setFont(new Font("Arial", Font.BOLD, 16));
+
 
         topPanel.add(returnButton);
         add(topPanel, BorderLayout.NORTH);
@@ -146,7 +153,7 @@ public class MealDetailsScreen extends JFrame {
         
         // Meal Name Button (styled like the meal catalogue button)
         JLabel mealNameLabel = new JLabel(meal.getMeal_name());
-        Color appColor = new Color(220, 31, 127);
+        //Color appColor = new Color(220, 31, 127);
         // mealNameLabel.setPreferredSize(new Dimension(200, 40));
         // mealNameLabel.setBackground(new Color(240, 240, 240));
         // mealNameLabel.setBorder(BorderFactory.createLineBorder(appColor, 2));
