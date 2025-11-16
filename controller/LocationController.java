@@ -24,8 +24,25 @@ public class LocationController {
         return locationDAO.getAllLocations();
     }
 
-    public List<Location> searchLocations(String type, String value) {
-        return locationDAO.searchLocations(type, value);
+    public List<Location> searchLocationById(String idStr){
+        try {
+            int id = Integer.parseInt(idStr);
+            return locationDAO.searchLocations("id", id);
+        } catch (NumberFormatException e) {
+            return List.of();
+        }
+    }
+
+    public List<Location> searchLocationByStreet(String street){
+        return locationDAO.searchLocations("street",street);
+    }
+
+    public List<Location> searchLocationByCity(String city){
+        return locationDAO.searchLocations("city",city);
+    }
+
+    public List<Location> searchLocationByZip(String zip){
+        return locationDAO.searchLocations("zip", zip);
     }
 
     public Location getLocationById(int id) {
