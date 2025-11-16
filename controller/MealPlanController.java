@@ -54,16 +54,21 @@ public class MealPlanController {
     }
 
 
-    public boolean updateMealPlan(MealPlan plan) {
-       
-        if (plan == null || plan.getPlan_id() <= 0) {
-            System.err.println("Validation Error: Invalid plan id.");
-            return false;
+    public String updateMealPlan(int id, String name, String description, float total_price) {    if (name == null || name.trim().isEmpty()) {
+        return "FAILURE: Plan name cannot be empty.";
+    }
+    if (total_price < 0) {
+        return "FAILURE: Total price cannot be negative.";
+    }
+        MealPlan existing = mealPlanDAO.getMealPlanByName(name);
+        if (existing!=null && existing.getPlan_id() !=id) {
+            return "FAILURE: Plan name must be unique.";
         }
-        if (plan.getPlan_name() == null || plan.getPlan_name().trim().isEmpty()) {
-            System.err.println("Validation Error: Plan name cannot be empty.");
-            return false;
-        }
-        return mealPlanDAO.updateMealPlan(plan);
+    MealPlan updatedPlan = new MealPlan(id, name, description, total_price);
+        if (mealPlanDAO.updateMealPlan(updatedPlan)) {
+        return "SUCCESS";
+    } else {
+        return "Failed to update plan in database.";
+    }
     }
 }

@@ -6,6 +6,7 @@ import model.Meal;
 import DAO.MealPlanDAO; 
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class MealPlanPanel extends JPanel
             @Override
             public boolean isCellEditable(int row, int column) 
             {
-                // Allow editing of Plan Name, Description, and Price
+               
                 return column > 0; 
             }
         };
@@ -160,11 +161,12 @@ public class MealPlanPanel extends JPanel
         planTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         planTable.getTableHeader().setReorderingAllowed(false);
         
-        // Listener for cell edits to handle updates
+
         tableModel.addTableModelListener(e -> {
             if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
                 int row = e.getFirstRow();
-                updateMealPlanFromTable(row);
+                int column = e.getColumn();
+                updateMealPlanFromTable(tableModel,row, column);
             }
         });
         
@@ -221,11 +223,23 @@ public class MealPlanPanel extends JPanel
             @Override
             public boolean isCellEditable(int row, int column)
             {
-                return false;
+                return column > 0;
             }
         };
 
         searchResultTable = new JTable(searchTableModel);
+
+        searchTableModel.addTableModelListener(e -> {
+            if (e.getType()== TableModelEvent.UPDATE) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+
+                if (column != 0) {
+                    updateMealPlanFromTable(searchTableModel, row, column);
+                }
+            }
+        });     
+
         searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         searchResultTable.getTableHeader().setReorderingAllowed(false);
         
@@ -289,44 +303,40 @@ public class MealPlanPanel extends JPanel
         }
     }
     
-    private void updateMealPlanFromTable(int row) 
+    private void updateMealPlanFromTable(DefaultTableModel model, int row, int column) 
     {
         try {
-            int id = (int) tableModel.getValueAt(row, 0);
-            String newName = tableModel.getValueAt(row, 1).toString().trim();
-            String newDescription = tableModel.getValueAt(row, 2).toString().trim();
-            float newPrice = 0.0f;
+            int id = Integer.parseInt(model.getValueAt(row, 0).toString());
+            String newName = (String)model.getValueAt(row, 1).toString();
+            String newDescription = (String)model.getValueAt(row, 2).toString();
+            float cost = Float.parseFloat(model.getValueAt(row, 3).toString());
+            String result = controller.updateMealPlan(id, newName, newDescription, cost);
             
-            try {
-                newPrice = Float.parseFloat(tableModel.getValueAt(row, 3).toString().trim());
-            } catch (NumberFormatException nfe) {
-                 JOptionPane.showMessageDialog(this, "Invalid price format. Reverting cell.",
-                                             "Input Error", JOptionPane.ERROR_MESSAGE);
-                 refreshPlanTable();
-                 return;
-            }
-            
-            MealPlan updatedPlan = new MealPlan(id, newName, newDescription, newPrice);
-            
-            // Check for name emptiness before attempting update
-            if (newName.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Plan Name cannot be empty. Reverting cell.",
-                                             "Validation Error", JOptionPane.ERROR_MESSAGE);
-                refreshPlanTable();
-                return;
-            }
-            
-            if (controller.updateMealPlan(updatedPlan)) {
-                // Success is handled silently
+            if (newName.trim().isEmpty()) {
+             JOptionPane.showMessageDialog(this, "Plan Name cannot be empty.",
+                 "Validation Error", JOptionPane.ERROR_MESSAGE);
+             refreshPlanTable(); 
+             return;
+        }
+            if ("SUCCESS".equals(result)) {
             } else {
-                JOptionPane.showMessageDialog(this, "Update failed. Check if Plan Name is unique.",
-                                             "Update Error", JOptionPane.ERROR_MESSAGE);
-                refreshPlanTable();
+                JOptionPane.showMessageDialog(this, "Failed to update Plan ID " + id + ": " + result, "Database Error", JOptionPane.ERROR_MESSAGE);
+                
+                if (tableModel == this.tableModel) {
+                     refreshPlanTable(); 
+                 } else {
+                     searchMealPlan(); 
+                 }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Invalid data or update error: " + e.getMessage(),
                                          "Error", JOptionPane.ERROR_MESSAGE);
-            refreshPlanTable(); // Revert table state
+            
+            if (tableModel == this.tableModel) {
+                 refreshPlanTable(); 
+             } else {
+                 searchMealPlan(); 
+             }           
         }
     }
 
