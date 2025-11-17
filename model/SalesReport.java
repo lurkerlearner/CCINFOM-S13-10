@@ -34,6 +34,13 @@ public class SalesReport {
         this.net_profit = net_profit;
     }
 
+    public SalesReport(int year, int sales_made, double gross_income, double net_profit) {
+        this.year = year;
+        this.sales_made = sales_made;
+        this.gross_income = gross_income;
+        this.net_profit = net_profit;
+    }
+
     public int getYear() {
         return year;
     }

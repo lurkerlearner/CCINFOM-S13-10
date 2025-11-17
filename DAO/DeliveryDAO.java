@@ -616,7 +616,7 @@ public class DeliveryDAO
      * sold in order to get the gross income (sum of all prices of the meals ordered)
      * and profit made (price - cost).
      */
-    public ArrayList<SalesReport> generateSalesReport(int year, int month) {
+    public ArrayList<SalesReport> generateSalesReportByMonthYear(int year, int month) {
         ArrayList<SalesReport> report = new ArrayList<>();
 
         String sqlQuery = """
@@ -643,6 +643,46 @@ public class DeliveryDAO
                     SalesReport salesRecord = new SalesReport(
                         rs.getInt("year"),
                         rs.getInt("month"),
+                        rs.getInt("sales_made"),
+                        rs.getDouble("gross_income"),
+                        rs.getDouble("net_profit")
+                    );
+                    report.add(salesRecord);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return report;
+    }
+
+    public ArrayList<SalesReport> generateSalesReportByYear(int year) {
+        ArrayList<SalesReport> report = new ArrayList<>();
+
+        String sqlQuery = """
+                SELECT YEAR(d.order_date) AS year,
+                COUNT(d.transaction_id) AS sales_made, SUM(m.price) AS gross_income,
+                SUM(m.price - m.cost) AS net_profit
+                FROM DELIVERY d 
+                JOIN MEAL m ON d.meal_id = m.meal_id
+                WHERE d.delivery_status <> 'Cancelled' AND d.payment_status = 'Paid'
+                    AND YEAR(d.order_date) = ?
+                GROUP BY YEAR(d.order_date)
+                ORDER BY year
+                """;
+
+        try(PreparedStatement stmt = c.prepareStatement(sqlQuery))
+        {
+            stmt.setInt(1, year);
+
+            try(ResultSet rs = stmt.executeQuery())
+            {
+                while(rs.next())
+                {
+                    SalesReport salesRecord = new SalesReport(
+                        rs.getInt("year"),
                         rs.getInt("sales_made"),
                         rs.getDouble("gross_income"),
                         rs.getDouble("net_profit")

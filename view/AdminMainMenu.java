@@ -93,8 +93,8 @@ public class AdminMainMenu extends JFrame {
         });
 
         generateReportBtn.addActionListener(e -> {
-            // TODO: implement whatever
-            JOptionPane.showMessageDialog(this, "Generate a report clicked."); // just to test if button works
+            this.dispose();
+            new GenerateReportFrame().setVisible(true);
         });
 
 

@@ -120,6 +120,14 @@ public class DeliveryController
         return deliveryDAO.getDeliveriesPerLocationWithFloodData();
     }
 
+    public ArrayList<SalesReport> generateSalesReportByMonthYear(int year, int month) {
+        return deliveryDAO.generateSalesReportByMonthYear(year, month);
+    }
+
+    public ArrayList<SalesReport> generateSalesReportByYear(int year) {
+        return deliveryDAO.generateSalesReportByYear(year);
+    }
+
     // TRANSACTION: ORDER PLACEMENT
 
     /* 
@@ -333,7 +341,6 @@ public class DeliveryController
 
         return true;
     }
-
 
     /* 
     compute flood risk first and ask for confirmation if client
