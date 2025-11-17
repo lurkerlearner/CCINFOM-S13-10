@@ -17,13 +17,12 @@ public class ClientDietPreferencePanel extends JPanel {
     private JPanel addPanel;
     private JPanel viewPanel;
     private JPanel searchPanel;
-    private JPanel editPanel;
 
     private JTextField dietPrefField, clientIdField;
 
     private JTable cdTable;
     private DefaultTableModel cdTableModel;
-    private JButton refreshButton;
+    private JButton refreshBtn;
 
     private JButton searchButton;
     private JComboBox<String> searchTypeDropdown;
@@ -31,7 +30,7 @@ public class ClientDietPreferencePanel extends JPanel {
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
 
-    private JButton mainMenuBtn, addBtn, searchBtn;
+    private JButton mainMenuBtn, addBtn, searchBtn, deleteBtn;
 
     public ClientDietPreferencePanel(ClientDietPreferenceController controller){
         this.controller = controller;
@@ -50,12 +49,10 @@ public class ClientDietPreferencePanel extends JPanel {
         createAddPanel();
         createViewPanel();
         createSearchPanel();
-        createEditPanel();
 
         tabbedPane.addTab("Add Record", addPanel);
         tabbedPane.addTab("View All", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
-        tabbedPane.addTab("Edit", editPanel);
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -134,9 +131,17 @@ public class ClientDietPreferencePanel extends JPanel {
         cdTable = new JTable(cdTableModel);
         cdTable.getTableHeader().setReorderingAllowed(false);
 
-        refreshViewTable();
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        deleteBtn = new JButton("Remove Selected");
+        deleteBtn.addActionListener(e -> removeMapping());
+
+        refreshBtn = new JButton("Refresh");
+        refreshBtn.addActionListener(e -> refreshViewTable());
+        btnPanel.add(refreshBtn);
+        btnPanel.add(deleteBtn);
 
         viewPanel.add(new JScrollPane(cdTable), BorderLayout.CENTER);
+        viewPanel.add(btnPanel, BorderLayout.SOUTH);
     }
 
     private void refreshViewTable() {
@@ -179,12 +184,6 @@ public class ClientDietPreferencePanel extends JPanel {
         searchPanel.add(new JScrollPane(searchResultTable), BorderLayout.CENTER);
     }
 
-    public void createEditPanel(){
-        editPanel = new JPanel(new BorderLayout());
-        editPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        //todo:IMPLEMENT EDIT
-    }
 
     public void searchCdp(){
         searchTableModel.setRowCount(0);
@@ -212,9 +211,24 @@ public class ClientDietPreferencePanel extends JPanel {
         }
     }
 
+    private void removeMapping() {
+        int selectedRow = cdTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Select a mapping to remove.");
+            return;
+        }
 
+        int dietPrefID = (int) cdTableModel.getValueAt(selectedRow, 0);
+        int clientID = (int) cdTableModel.getValueAt(selectedRow, 1);
 
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to remove this diet preference from the client?",
+                "Confirm Removal", JOptionPane.YES_NO_OPTION);
 
-
-
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (controller.remove(dietPrefID, clientID)) {
+                refreshViewTable();
+            }
+        }
+    }
 }

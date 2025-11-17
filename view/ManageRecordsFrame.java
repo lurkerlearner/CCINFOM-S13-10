@@ -87,7 +87,7 @@ public class ManageRecordsFrame extends JFrame {
         supplierController = new SupplierController(new SupplierDAO());
         riderController = new RiderController(new RiderDAO(DBConnection.getConnection()));
         mealIngredientController = new MealIngredientController(new MealIngredientDAO());
-        clientDietPreferenceController = new ClientDietPreferenceController();
+        clientDietPreferenceController = new ClientDietPreferenceController(new ClientDietPreferenceDAO(), new ClientDAO(), new DietPreferenceDAO());
 
 
         // Initialize each record panel

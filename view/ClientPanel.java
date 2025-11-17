@@ -159,8 +159,6 @@ public class ClientPanel extends JPanel {
         buttonPanel.add(refreshBtn);
         buttonPanel.add(deleteBtn);
 
-
-
         viewPanel.add(new JScrollPane(clientTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
