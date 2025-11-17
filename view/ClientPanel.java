@@ -8,14 +8,19 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClientPanel extends JPanel {
 
-    private ClientController controller;
+    private ClientController clientController;
+    private MealPlanController mealPlanController = new MealPlanController();
+    private DietPreferenceController dietController = new DietPreferenceController();
 
 
-    private JTextField nameField, contactField, unitField, locationIdField, planIdField, dietIdField;
+    private JTextField nameField, contactField, unitField, locationIdField;
     private JPasswordField passwordField;
+    private JComboBox<MealPlan> mealPlanDropdown;
+    private JList<DietPreference> dietList;
     private JButton addClientBtn;
     private JButton refreshBtn;
 
@@ -43,7 +48,7 @@ public class ClientPanel extends JPanel {
     private JButton mainMenuButton;
 
    public ClientPanel(ClientController controller){
-       this.controller = controller;
+       this.clientController = controller;
        setLayout(new BorderLayout());
        initComponents();
    }
@@ -81,8 +86,18 @@ public class ClientPanel extends JPanel {
         passwordField = new JPasswordField(20);
         unitField = new JTextField(20);
         locationIdField = new JTextField(5);
-        planIdField = new JTextField(5);
-        dietIdField = new JTextField(5);
+
+        mealPlanDropdown = new JComboBox<>();
+        for (MealPlan mp : mealPlanController.getAllMealPlans()) {
+            mealPlanDropdown.addItem(mp);
+        }
+
+        dietList = new JList<>(
+                dietController.getAvailableDietPreferences().toArray(new DietPreference[0])
+        );
+        dietList.setVisibleRowCount(5);
+        dietList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
 
         int row = 0;
         addField(formPanel, gbc, row++, "Name:", nameField);
@@ -90,8 +105,18 @@ public class ClientPanel extends JPanel {
         addField(formPanel, gbc, row++, "Password:", passwordField);
         addField(formPanel, gbc, row++, "Unit Details:", unitField);
         addField(formPanel, gbc, row++, "Location ID:", locationIdField);
-        addField(formPanel, gbc, row++, "Plan ID:", planIdField);
-        addField(formPanel, gbc, row++, "Diet Pref ID:", dietIdField);
+        addField(formPanel, gbc, row++, "Meal Plan:", mealPlanDropdown);
+
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        formPanel.add(new JLabel("Diet Preferences:"), gbc);
+
+        gbc.gridx = 1;
+        JScrollPane dietScroll = new JScrollPane(dietList);
+        dietScroll.setPreferredSize(new Dimension(200, 100));
+        formPanel.add(dietScroll, gbc);
+        row++;
+
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -117,7 +142,7 @@ public class ClientPanel extends JPanel {
 
         clientTableModel = new DefaultTableModel(new String[]{
                 "Client ID", "Name", "Contact", "Password", "Unit", "Date Created",
-                "Location ID", "Plan ID", "Diet Pref ID"
+                "Location ID", "Plan ID"
         }, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -154,7 +179,7 @@ public class ClientPanel extends JPanel {
 
         searchTableModel = new DefaultTableModel(new String[]{
                 "Client ID", "Name", "Contact", "Password", "Unit", "Date",
-                "Location ID", "Plan ID", "Diet Pref ID"
+                "Location ID", "Plan ID"
         }, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -186,9 +211,9 @@ public class ClientPanel extends JPanel {
         List<Client> results;
 
         switch (searchTypeDropdown.getSelectedIndex()) {
-            case 0 -> results = controller.searchClientsByName(query);
-            case 1 -> results = controller.searchClientsById(query);
-            case 2 -> results = controller.searchClientsByContact(query);
+            case 0 -> results = clientController.searchClientsByName(query);
+            case 1 -> results = clientController.searchClientsById(query);
+            case 2 -> results = clientController.searchClientsByContact(query);
             default -> { return; }
         }
 
@@ -204,7 +229,6 @@ public class ClientPanel extends JPanel {
                     c.getDateCreated().format(formatter),
                     c.getLocationID(),
                     c.getPlanID(),
-                    c.getDietPreferenceID()
             });
         }
     }
@@ -224,8 +248,7 @@ public class ClientPanel extends JPanel {
                         "Unit: "      + searchTableModel.getValueAt(row, 4) + "\n" +
                         "Date: "      + searchTableModel.getValueAt(row, 5) + "\n" +
                         "Location ID: " + searchTableModel.getValueAt(row, 6) + "\n" +
-                        "Plan ID: "     + searchTableModel.getValueAt(row, 7) + "\n" +
-                        "Diet Pref ID: "+ searchTableModel.getValueAt(row, 8) + "\n";
+                        "Plan ID: "     + searchTableModel.getValueAt(row, 7) + "\n";
 
         JTextArea area = new JTextArea(details);
         area.setEditable(false);
@@ -253,11 +276,18 @@ public class ClientPanel extends JPanel {
             String contact = contactField.getText();
             String password = new String(passwordField.getPassword());
             String unit = unitField.getText();
-            int locationID = Integer.parseInt(locationIdField.getText());
-            int planID = Integer.parseInt(planIdField.getText());
-            int dietID = Integer.parseInt(dietIdField.getText());
 
-            boolean success = controller.addClient(name, contact, password, unit, planID, dietID, locationID);
+            int locationID = Integer.parseInt(locationIdField.getText());
+
+            MealPlan selectedPlan = (MealPlan) mealPlanDropdown.getSelectedItem();
+            int planID = selectedPlan.getPlan_id();
+
+            List<Integer> dietIDs = dietList.getSelectedValuesList()
+                    .stream()
+                    .map(DietPreference::getDiet_preference_id)
+                    .collect(Collectors.toList());
+
+            boolean success = clientController.addClient(name, contact, password, unit, planID, dietIDs, locationID);
 
             if (success) {
                 JOptionPane.showMessageDialog(this, "Client added successfully!");
@@ -275,7 +305,7 @@ public class ClientPanel extends JPanel {
     private void refreshClientTable() {
         clientTableModel.setRowCount(0);
 
-        List<Client> clients = controller.getAllClients();
+        List<Client> clients = clientController.getAllClients();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         for (Client c : clients) {
@@ -288,7 +318,6 @@ public class ClientPanel extends JPanel {
                     c.getDateCreated().format(formatter),
                     c.getLocationID(),
                     c.getPlanID(),
-                    c.getDietPreferenceID()
             });
         }
 
@@ -300,8 +329,8 @@ public class ClientPanel extends JPanel {
         passwordField.setText("");
         unitField.setText("");
         locationIdField.setText("");
-        planIdField.setText("");
-        dietIdField.setText("");
+        dietList.clearSelection();
+        mealPlanDropdown.setSelectedIndex(0);
     }
 
 }

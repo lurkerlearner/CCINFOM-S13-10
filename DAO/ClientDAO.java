@@ -8,8 +8,7 @@ import java.util.*;
 public class ClientDAO {
 
     public int addClient(Client c) {
-        String sql = "INSERT INTO client (name, contact_no, password, unit_details, date_created, " +
-                "location_id, plan_id, diet_preference_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO client (name, contact_no, password, unit_details, date_created, location_id, plan_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -21,10 +20,8 @@ public class ClientDAO {
             stmt.setDate(5, java.sql.Date.valueOf(c.getDateCreated()));
             stmt.setInt(6, c.getLocationID());
             stmt.setInt(7, c.getPlanID());
-            stmt.setInt(8, c.getDietPreferenceID());
 
             stmt.executeUpdate();
-
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) return rs.getInt(1);
 
@@ -34,27 +31,51 @@ public class ClientDAO {
         return -1;
     }
 
+
+    public void addClientDietPreferences(int clientId, List<Integer> dietPrefIds) {
+        String sql = "INSERT INTO client_diet_preference (client_id, diet_preference_id) VALUES (?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (Integer dietId : dietPrefIds) {
+                ps.setInt(1, clientId);
+                ps.setInt(2, dietId);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void loadDietPreferences(Client c, Connection conn) throws SQLException {
+        String sql = "SELECT diet_preference_id FROM client_diet_preference WHERE client_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, c.getClientID());
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Integer> dietIds = new ArrayList<>();
+                while (rs.next()) {
+                    dietIds.add(rs.getInt("diet_preference_id"));
+                }
+                c.setDietPreferenceIDs(dietIds);
+            }
+        }
+    }
+
+
     public Client getClientById(int id) {
         String sql = "SELECT * FROM CLIENT WHERE client_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            System.out.println("Looking for client ID: " + id); //debugging
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
-                Client c = new Client(
-                        rs.getInt("client_id"),
-                        rs.getString("name"),
-                        rs.getString("contact_no"),
-                        rs.getString("password"),
-                        rs.getString("unit_details"),
-                        rs.getDate("date_created").toLocalDate(),
-                        rs.getInt("location_id"),
-                        rs.getInt("plan_id"),
-                        rs.getInt("diet_preference_id")
-                );
+                Client c = mapResultSetToClient(rs);
+                loadDietPreferences(c, conn);
                 return c;
             }
 
@@ -85,7 +106,8 @@ public class ClientDAO {
                 c.setDateCreated(rs.getDate("date_created").toLocalDate());
                 c.setLocationID(rs.getInt("location_id"));
                 c.setPlanID(rs.getInt("plan_id"));
-                c.setDietPreferenceID(rs.getInt("diet_preference_id"));
+
+                loadDietPreferences(c,conn);
 
                 return c;
             }
@@ -194,6 +216,7 @@ public class ClientDAO {
         return clients;
     }
 
+
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
         Client c = new Client();
         c.setClientID(rs.getInt("client_id"));
@@ -204,11 +227,9 @@ public class ClientDAO {
         c.setDateCreated(rs.getDate("date_created").toLocalDate());
         c.setLocationID(rs.getInt("location_id"));
         c.setPlanID(rs.getInt("plan_id"));
-        c.setDietPreferenceID(rs.getInt("diet_preference_id"));
-
-
         return c;
     }
+
 
 
 }

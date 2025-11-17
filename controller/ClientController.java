@@ -18,19 +18,27 @@ public class ClientController {
     }
 
     public boolean addClient(String name, String contact, String password, String unit,
-                             int planID, int dietID, int locationID) {
+                             int planID, List<Integer> dietIDs, int locationID) {
         Client c = new Client();
         c.setName(name);
         c.setContactNo(contact);
         c.setPassword(password);
         c.setUnitDetails(unit);
         c.setPlanID(planID);
-        c.setDietPreferenceID(dietID);
+        c.setDietPreferenceIDs(dietIDs);
         c.setLocationID(locationID);
         c.setDateCreated(LocalDate.now());
 
-        return clientDAO.addClient(c) > 0;
+        int clientId = clientDAO.addClient(c);
+
+        if (clientId > 0) {
+            clientDAO.addClientDietPreferences(clientId, dietIDs);
+            return true;
+        }
+
+        return false;
     }
+
 
 
     public boolean addClient(Client client) {

@@ -5,6 +5,8 @@ import controller.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisterScreen extends JFrame {
 
@@ -40,10 +42,11 @@ public class RegisterScreen extends JFrame {
         loadLocations(locationDrop);
         JComboBox<MealPlanItem> mealPlanDrop = new JComboBox<>();
         loadMealPlans(mealPlanDrop);
-        JComboBox<DietPreferenceItem> dietDrop = new JComboBox<>();
-        loadDietPreferences(dietDrop);
-
-
+        JList<DietPreferenceItem> dietList = new JList<>();
+        dietList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        loadDietPreferences(dietList);
+        JScrollPane dietScroll = new JScrollPane(dietList);
+        dietScroll.setPreferredSize(new Dimension(200, 100));
 
         JCheckBox showPassword = new JCheckBox("Show Password");
 
@@ -90,7 +93,7 @@ public class RegisterScreen extends JFrame {
         gbc.gridx = 0; gbc.gridy = 8;
         mainPanel.add(new JLabel("Diet Preference"), gbc);
         gbc.gridx = 1;
-        mainPanel.add(dietDrop, gbc);
+        mainPanel.add(dietScroll, gbc);
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -141,10 +144,19 @@ public class RegisterScreen extends JFrame {
 
             int locationId = ((LocationItem) locationDrop.getSelectedItem()).id;
             int mealPlanId = ((MealPlanItem) mealPlanDrop.getSelectedItem()).id;
-            int dietPrefId = ((DietPreferenceItem) dietDrop.getSelectedItem()).id;
+
+            List<Integer> dietPrefIds = new ArrayList<>();
+            for (DietPreferenceItem item : dietList.getSelectedValuesList()) {
+                dietPrefIds.add(item.id);
+            }
+
+            if (dietPrefIds.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select at least one diet preference.");
+                return;
+            }
 
 
-            boolean success = loginController.register(name, contact, password, unit, locationId,mealPlanId,dietPrefId);
+            boolean success = loginController.register(name, contact, password, unit, locationId, mealPlanId, dietPrefIds);
 
             if (success) {
                 JOptionPane.showMessageDialog(this, "Account successfully created!");
@@ -198,19 +210,22 @@ public class RegisterScreen extends JFrame {
         }
     }
 
-    private void loadDietPreferences(JComboBox<DietPreferenceItem> comboBox) {
+    private void loadDietPreferences(JList<DietPreferenceItem> list) {
+        DefaultListModel<DietPreferenceItem> model = new DefaultListModel<>();
         try {
             var conn = DBConnection.getConnection();
             var stmt = conn.prepareStatement("SELECT diet_preference_id, diet_name FROM diet_preference");
             var rs = stmt.executeQuery();
 
             while (rs.next()) {
-                comboBox.addItem(new DietPreferenceItem(rs.getInt("diet_preference_id"), rs.getString("diet_name")));
+                model.addElement(new DietPreferenceItem(rs.getInt("diet_preference_id"), rs.getString("diet_name")));
             }
+            list.setModel(model);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
 
     class LocationItem {

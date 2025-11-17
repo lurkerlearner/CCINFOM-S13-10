@@ -1,6 +1,8 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
 
@@ -12,12 +14,13 @@ public class Client {
     private LocalDate dateCreated;
     private int locationID;
     private int planID;
-    private int dietPreferenceID;
+    private List<Integer> dietPreferenceIDs;
+
 
     public Client() {}
 
     public Client(String name, String contactNo, String password, String unitDetails,
-                  LocalDate dateCreated, int locationID, int planID, int dietPreferenceID) {
+                  LocalDate dateCreated, int locationID, int planID, List<Integer> dietPreferenceIDs) {
         this.name = name;
         this.contactNo = contactNo;
         this.password = password;
@@ -25,11 +28,11 @@ public class Client {
         this.dateCreated = dateCreated;
         this.locationID = locationID;
         this.planID = planID;
-        this.dietPreferenceID = dietPreferenceID;
+        this.dietPreferenceIDs = new ArrayList<>(dietPreferenceIDs); // copy values
     }
 
     public Client(int clientID, String name, String contactNo, String password,
-                  String unitDetails, LocalDate dateCreated, int locationID, int planID, int dietPreferenceID) {
+                  String unitDetails, LocalDate dateCreated, int locationID, int planID, List<Integer> dietPreferenceIDs) {
         this.clientID = clientID;
         this.name = name;
         this.contactNo = contactNo;
@@ -38,7 +41,7 @@ public class Client {
         this.dateCreated = dateCreated;
         this.locationID = locationID;
         this.planID = planID;
-        this.dietPreferenceID = dietPreferenceID;
+        this.dietPreferenceIDs = new ArrayList<>(dietPreferenceIDs); // copy values
     }
 
 
@@ -66,6 +69,7 @@ public class Client {
     public int getPlanID() { return planID; }
     public void setPlanID(int planID) { this.planID = planID; }
 
-    public int getDietPreferenceID() { return dietPreferenceID; }
-    public void setDietPreferenceID(int dietPreferenceID) { this.dietPreferenceID = dietPreferenceID; }
+    public List<Integer> getDietPreferenceIDs() {return dietPreferenceIDs;}
+
+    public void setDietPreferenceIDs(List<Integer> dietPreferenceIDs) {this.dietPreferenceIDs = dietPreferenceIDs;}
 }

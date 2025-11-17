@@ -4,6 +4,8 @@ import DAO.ClientDAO;
 import model.Client;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LoginController {
 
@@ -13,37 +15,23 @@ public class LoginController {
         this.clientDAO = new ClientDAO();
     }
 
-    public boolean register(String fullname,
-                            String contactNo,
-                            String password,
-                            String unitDetails,
-                            int locationId,
-                            int planId,
-                            int dietPrefId) {
+    public boolean register(String fullname, String contactNo, String password,
+                            String unitDetails, int locationId, int planId, List<Integer> dietPrefIds) {
+        if (clientDAO.isContactExists(contactNo)) return false;
 
+        Client c = new Client(fullname, contactNo, password, unitDetails,
+                LocalDate.now(), locationId, planId, dietPrefIds);
+        int clientId = clientDAO.addClient(c);
 
-        if (clientDAO.isContactExists(contactNo)) {
-            return false; //DUPLICATE TRACKING
+        if (clientId > 0) {
+            clientDAO.addClientDietPreferences(clientId, dietPrefIds);
+            return true;
         }
 
-        // default plan/diet for new users
-        int defaultPlanId = 1;
-        int defaultDietId = 1;
-
-        Client c = new Client(
-                fullname,
-                contactNo,
-                password,
-                unitDetails,
-                LocalDate.now(),
-                locationId,
-                planId,
-                dietPrefId
-        );
-
-        int generatedId = clientDAO.addClient(c);
-        return generatedId > 0;
+        return false;
     }
+
+
 
     public Client login(String contact, String password) {
         return clientDAO.login(contact.trim(), password.trim());
