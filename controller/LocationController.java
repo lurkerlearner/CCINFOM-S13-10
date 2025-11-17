@@ -45,6 +45,10 @@ public class LocationController {
         return locationDAO.searchLocations("zip", zip);
     }
 
+    public boolean deleteLocation(int locationId) {
+        return locationDAO.deleteLocation(locationId);
+    }
+
     public Location getLocationById(int id) {
         return locationDAO.getLocationById(id);
     }

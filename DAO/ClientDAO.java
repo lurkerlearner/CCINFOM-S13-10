@@ -224,7 +224,7 @@ public class ClientDAO {
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLIntegrityConstraintViolationException e) {
-            // Handle FK constraints explicitly if needed
+            //for FK stuff
             System.err.println("Cannot delete client due to related records: " + e.getMessage());
             return false;
         } catch (SQLException e) {

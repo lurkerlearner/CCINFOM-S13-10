@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9cd77863-6cba-441f-a7e5-0a3e5179b3d4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/DAO/ClientDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DAO/ClientDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/ClientPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/ClientPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DAO/LocationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DAO/LocationDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/controller/LocationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/LocationPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/LocationPanel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +54,7 @@
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/faith/Downloads/CCINFOM",
-    "settings.editor.selected.configurable": "project.propVCSSupport.Mappings"
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.Console Colors"
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
