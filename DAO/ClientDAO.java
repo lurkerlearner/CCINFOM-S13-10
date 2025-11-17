@@ -269,18 +269,21 @@ public class ClientDAO {
         }
     }
 
-    public void updateClientDietPreferences(int clientId, List<Integer> dietIds) throws SQLException {
-        Connection conn = DBConnection.getConnection(); // single connection for the whole method
-        try {
-            conn.setAutoCommit(false); // start transaction
+    public boolean updateClientDietPreferences(int clientId, List<Integer> dietIds) throws SQLException {
 
-            String deleteSql = "DELETE FROM CLIENT_DIET_PREFERENCE WHERE client_id = ?";
+        String deleteSql = "DELETE FROM CLIENT_DIET_PREFERENCE WHERE client_id = ?";
+        String insertSql = "INSERT INTO CLIENT_DIET_PREFERENCE (diet_preference_id, client_id) VALUES (?, ?)";
+
+        Connection conn = DBConnection.getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+
             try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
                 ps.setInt(1, clientId);
                 ps.executeUpdate();
             }
 
-            String insertSql = "INSERT INTO CLIENT_DIET_PREFERENCE(diet_preference_id, client_id) VALUES (?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
                 for (Integer dietId : dietIds) {
                     ps.setInt(1, dietId);
@@ -291,14 +294,48 @@ public class ClientDAO {
             }
 
             conn.commit();
+            return true;
 
         } catch (SQLException e) {
             conn.rollback();
+            throw e;
+
         } finally {
             conn.setAutoCommit(true);
+            conn.close();
         }
     }
 
+
+    public boolean updateClientBasicInfo(int clientId,
+                                         String name,
+                                         String contact,
+                                         String password,
+                                         String unit,
+                                         int planId,
+                                         int locationId) throws SQLException {
+
+        String sql = """
+        UPDATE CLIENT 
+        SET name = ?, contact_no = ?, password = ?, unit_details = ?, 
+            plan_id = ?, location_id = ?
+        WHERE client_id = ?
+    """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, contact);
+            ps.setString(3, password);
+            ps.setString(4, unit);
+            ps.setInt(5, planId);
+            ps.setInt(6, locationId);
+            ps.setInt(7, clientId);
+
+            return ps.executeUpdate() > 0;
+        }
+    }
 
 
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {

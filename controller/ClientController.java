@@ -3,6 +3,7 @@ package controller;
 import DAO.*;
 import model.*;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import java.time.LocalDate;
@@ -74,17 +75,25 @@ public class ClientController {
         return clientDAO.deleteClient(clientId);
     }
 
-    public boolean updateClient(int clientId, String name, String contact, String password,
-                                String unit, int planId, List<Integer> dietIds, int locationId) {
+    public boolean updateClientBasicInfo(int clientId,
+                                         String name,
+                                         String contact,
+                                         String password,
+                                         String unit,
+                                         int planId,
+                                         int locationId) {
         try {
+            return clientDAO.updateClientBasicInfo(clientId, name, contact, password, unit, planId, locationId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-            boolean updatedClient = clientDAO.updateClient(clientId, name, contact, password, unit, planId, locationId);
-            if (!updatedClient) return false;
-
-            clientDAO.updateClientDietPreferences(clientId, dietIds);
-
-            return true;
-        } catch (Exception e) {
+    public boolean updateClientDietPreferences(int clientId, List<Integer> dietIds) {
+        try {
+            return clientDAO.updateClientDietPreferences(clientId, dietIds);
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

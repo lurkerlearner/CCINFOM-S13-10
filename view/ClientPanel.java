@@ -8,8 +8,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ClientPanel extends JPanel {
 
@@ -286,13 +288,14 @@ public class ClientPanel extends JPanel {
                 }
 
                 List<Integer> dietIds = clientController.getDietPreferenceIDs(selected.getClientID());
-                int[] selectedIndices = Arrays.stream(editDietList.getSelectedIndices())
+
+                int[] selectedIndices = IntStream.range(0, editDietList.getModel().getSize())
                         .filter(i -> dietIds.contains(editDietList.getModel().getElementAt(i).getDiet_preference_id()))
                         .toArray();
+
                 editDietList.setSelectedIndices(selectedIndices);
             }
         });
-
 
         saveBtn.addActionListener(e -> {
             try {
@@ -308,13 +311,24 @@ public class ClientPanel extends JPanel {
                 String newUnit = editUnitField.getText();
                 int newLocation = Integer.parseInt(editLocationField.getText());
                 int newPlanId = ((MealPlan) editMealPlanDropdown.getSelectedItem()).getPlan_id();
-                List<Integer> newDietIds = editDietList.getSelectedValuesList()
-                        .stream().map(DietPreference::getDiet_preference_id).collect(Collectors.toList());
 
-                boolean ok = clientController.updateClient(
+                List<Integer> newDietIds = editDietList.getSelectedValuesList()
+                        .stream().map(DietPreference::getDiet_preference_id)
+                        .collect(Collectors.toList());
+
+
+                List<Integer> currentDietIds = clientController.getDietPreferenceIDs(selected.getClientID());
+
+                boolean dietChanged = !new HashSet<>(newDietIds).equals(new HashSet<>(currentDietIds));
+
+                boolean ok = clientController.updateClientBasicInfo(
                         selected.getClientID(), newName, newContact, newPassword,
-                        newUnit, newPlanId, newDietIds, newLocation
+                        newUnit, newPlanId, newLocation
                 );
+
+                if (ok && dietChanged) {
+                    ok = clientController.updateClientDietPreferences(selected.getClientID(), newDietIds);
+                }
 
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Client updated successfully!");
@@ -322,10 +336,12 @@ public class ClientPanel extends JPanel {
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to update client.");
                 }
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
             }
         });
+
     }
 
 
