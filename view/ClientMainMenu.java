@@ -103,6 +103,7 @@ public class ClientMainMenu extends JFrame {
         JButton viewCatalogueBtn = new JButton("View Meal Catalogue");
         JButton orderNowBtn = new JButton("Order Now");
         JButton accountMgmtBtn = new JButton("Account Management");
+        JButton forgotPassBtn = new JButton("Forgot Password");
 
         // create controller for catalogue view
         MealController mealController = new MealController();
@@ -112,7 +113,7 @@ public class ClientMainMenu extends JFrame {
 
         //==PAM PA DESIGN SA BUTTONS
         Dimension btnSize = new Dimension(250, 50);
-        for (JButton btn : new JButton[]{viewCatalogueBtn, orderNowBtn, accountMgmtBtn}) {
+        for (JButton btn : new JButton[]{viewCatalogueBtn, orderNowBtn, accountMgmtBtn, forgotPassBtn}) {
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             btn.setPreferredSize(btnSize);
             btn.setMaximumSize(btnSize);
@@ -140,8 +141,6 @@ public class ClientMainMenu extends JFrame {
         southPanel.add(logoutBtn);
         add(southPanel, BorderLayout.SOUTH);
 
-        //NGL ALL THE BUTTONS HERE ARE PLACEHOLDERS KASI I DONT WANT TO TOUCH THE ORDER STUFF ANYMORE
-        //THE ONLY THING THAT'S MINE IS ACCOUNT MANAGEMENT - ELISHA
 
         //==ACTION LISTENERS
         accountMgmtBtn.addActionListener(e -> {
@@ -159,6 +158,11 @@ public class ClientMainMenu extends JFrame {
             this.dispose();
             //JOptionPane.showMessageDialog(this, "Order Now clicked."); 
             new OrderScreen(client, dc, delDAO, cDAO, mDAO, mdDAO, fdDAO, rDAO, locationDAO).setVisible(true); // Rahnee
+        });
+
+        forgotPassBtn.addActionListener(e->{
+            this.dispose();
+            new ForgotPasswordScreen().setVisible(true); //elisha
         });
 
 

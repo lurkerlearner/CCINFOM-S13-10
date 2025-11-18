@@ -3,7 +3,10 @@ package DAO;
 import java.sql.*;
 import model.*;
 import app.*;
+
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClientDAO {
 
@@ -336,6 +339,58 @@ public class ClientDAO {
             return ps.executeUpdate() > 0;
         }
     }
+
+    public Client getClientByContact(String contact) {
+        String sql = "SELECT * FROM client WHERE contact_no = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, contact);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int clientID = rs.getInt("client_id");
+                String name = rs.getString("name");
+                String contactNo = rs.getString("contact_no");
+                String password = rs.getString("password");
+                String unit = rs.getString("unit_details");
+                LocalDate dateCreated = rs.getDate("date_created").toLocalDate();
+                int locationID = rs.getInt("location_id");
+                int planID = rs.getInt("plan_id");
+
+                List<Integer> dietPrefIDs = new ClientDietPreferenceDAO()
+                        .searchByClient(clientID)
+                        .stream()
+                        .map(ClientDietPreference::getDietPreferenceID)
+                        .collect(Collectors.toList());
+
+                return new Client(clientID, name, contactNo, password, unit, dateCreated, locationID, planID, dietPrefIDs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public boolean updateClientPassword(int clientId, String newPassword) {
+        String sql = "UPDATE client SET password = ? WHERE client_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setInt(2, clientId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 
 
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
