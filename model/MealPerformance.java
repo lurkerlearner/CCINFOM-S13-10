@@ -1,50 +1,35 @@
 package model;
 
 public class MealPerformance {
+    
+    private int meal_Id;
+    private String meal_name;
+    private int TimesOrdered;
+    private float TotalRevenue;
+    private int distinctlocations;
 
-    private int mealId;
-    private String mealName;
-    private int timesOrdered;
-    private float totalRevenue;
-    private int locationCount;
-
-public MealPerformance(int mealId, String mealName,int timesOrdered, float totalRevenue, int locationCount) {
-        this.mealId = mealId;
-        this.mealName = mealName;
-        this.timesOrdered = timesOrdered;
-        this.totalRevenue = totalRevenue;
-        this.locationCount = locationCount;
-    }
-
-    public int getMealId() {
-        return mealId;
+    public MealPerformance(int meal_Id, String meal_name, int TimesOrdered, float TotalRevenue, int distinctlocations){
+        this.meal_Id = meal_Id;
+        this.meal_name = meal_name;
+        this.TimesOrdered = TimesOrdered;
+        this.TotalRevenue = TotalRevenue;
+        this.distinctlocations = distinctlocations;
     }
 
-    public String getMealName() {
-        return mealName;
+    public int getMeal_id(){
+        return meal_Id;
+    }
+    public String getMeal_name(){
+        return meal_name;
     }
 
-    public int getTimesOrdered() {
-        return timesOrdered;
+    public int getTimesOrdered(){
+        return TimesOrdered;
     }
-
-    public float getTotalRevenue() {
-        return totalRevenue;
+    public float getTotalRevenue(){
+        return TotalRevenue;
     }
-
-    public int getLocationCount() {
-        return locationCount;
-    }
-    public void setMealName(String mealName) {
-        this.mealName = mealName;
-    }
-    public void setTimesOrdered(int timesOrdered) {
-        this.timesOrdered = timesOrdered;
-    }
-    public void setTotalRevenue(float totalRevenue) {
-        this.totalRevenue = totalRevenue;
-    }
-    public void setLocationCount(int locationCount) {
-        this.locationCount = locationCount;
-    }
+    public int getDistinctLocations(){
+        return distinctlocations;
+    }    
 }

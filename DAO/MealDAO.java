@@ -229,7 +229,7 @@ public class MealDAO {
         return report;
     }  
 
-    public List<MealPerformance> getMealPerformaceByYear(int year){
+    public List<MealPerformance> getMealPerformanceByYear(int year){
         List<MealPerformance> report = new ArrayList<>();
         String query = "SELECT m.meal_id, m.meal_name, COUNT(md.transaction_id) AS TimesOrdered, " +
                        " (COUNT(md.transaction_id) * m.price) AS TotalRevenue, " +

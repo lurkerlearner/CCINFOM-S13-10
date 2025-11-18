@@ -28,6 +28,7 @@ public class GenerateReportFrame extends JFrame {
     private JPanel mainPanel;
     private SalesReportPanel salesReportPanel;
     private ClientEngagementPanel clientEngagementPanel;
+    private MenuPopularityPanel menuPopularityPanel;
     // padagdag nlng panels para sa reports nyo
 
     // nav panel and buttons
@@ -71,6 +72,7 @@ public class GenerateReportFrame extends JFrame {
         // Initialize panels
         salesReportPanel = new SalesReportPanel(deliveryController);
         clientEngagementPanel = new ClientEngagementPanel(clientEngagementController);
+        menuPopularityPanel = new MenuPopularityPanel(mealController);
 
         // show sales report panel by default
         mainPanel.add(salesReportPanel, BorderLayout.CENTER);
