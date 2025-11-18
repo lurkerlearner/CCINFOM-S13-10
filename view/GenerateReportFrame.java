@@ -33,7 +33,7 @@ public class GenerateReportFrame extends JFrame {
 
     // nav panel and buttons
     private JPanel navPanel;
-    private JButton salesReportBtn, clientEngagementBtn;
+    private JButton salesReportBtn, clientEngagementBtn, menuPopularityBtn;
 
     public GenerateReportFrame() {
         setTitle("FloodPanda - Admin / Manage Records");
@@ -106,11 +106,14 @@ public class GenerateReportFrame extends JFrame {
         // Initialize buttons for each record panel
         salesReportBtn = createNavButton("Sales Report", e -> switchToPanel(salesReportPanel));
         clientEngagementBtn = createNavButton("Client Engagement", e-> switchToPanel(clientEngagementPanel));
-        
+        menuPopularityBtn = createNavButton("Menu Popularity Report", e -> switchToPanel(menuPopularityPanel));
+
         // Add buttons to navigation panel
         navPanel.add(salesReportBtn);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navPanel.add(clientEngagementBtn);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        navPanel.add(menuPopularityBtn);
         navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
 
