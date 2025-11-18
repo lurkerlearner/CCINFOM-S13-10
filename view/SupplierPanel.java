@@ -19,6 +19,7 @@ public class SupplierPanel extends JPanel
     private JPanel addPanel;
     private JPanel viewPanel;
     private JPanel searchPanel;
+    private JPanel editPanel;
 
     // Components for adding suppliers
     private JTextField supplier_name;
@@ -33,12 +34,20 @@ public class SupplierPanel extends JPanel
     private JButton refreshButton;
     private JButton detailsButton;
 
+    private JButton deleteBtn;
+
     // Components for searching suppliers
     private JButton searchButton;
     private JComboBox<String> searchTypeComboBox;
     private JTextField searchField;
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
+
+    // Components for editing suppliers
+    private JTextField editSupplierName;
+    private JTextField editContactNo;
+    private JTextField editAltContactNo;
+    private JTextField editLocationID;
 
     // Button to return to main menu
     private JButton mainMenuButton;
@@ -62,10 +71,12 @@ public class SupplierPanel extends JPanel
         createAddPanel();
         createViewPanel();
         createSearchPanel();
+        createEditPanel();
         
         tabbedPane.addTab("Add Supplier", addPanel);
         tabbedPane.addTab("View All", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
+        tabbedPane.addTab("Edit Supplier", editPanel);
         
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -198,12 +209,16 @@ public class SupplierPanel extends JPanel
         
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> refreshSupplierTable());
+
+        deleteBtn = new JButton("Delete Selected");
+        deleteBtn.addActionListener(e -> deleteSupplier());
         
         detailsButton = new JButton("View Details");
         detailsButton.addActionListener(e -> showSupplierDetails());
 
         buttonPanel.add(refreshButton);
         buttonPanel.add(detailsButton);
+        buttonPanel.add(deleteBtn);
         
         viewPanel.add(new JScrollPane(supplierTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -412,5 +427,151 @@ public class SupplierPanel extends JPanel
         }
     }
 
-    
+    private void createEditPanel() {
+        editPanel = new JPanel(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 8, 8, 8);
+
+        JComboBox<Supplier> supplierDropdown = new JComboBox<>();
+        for (Supplier s : controller.getAllSuppliers()) {
+            supplierDropdown.addItem(s);
+        }
+        supplierDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Supplier supplier) {
+                    setText(supplier.getSupplier_id() + " - " + supplier.getSupplier_name());
+                }
+                return this;
+            }
+        });
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Select Supplier:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(supplierDropdown, gbc);
+
+        editSupplierName = new JTextField(20);
+        editContactNo = new JTextField(15);
+        editAltContactNo = new JTextField(15);
+        editLocationID = new JTextField(5);
+
+        int row = 1;
+        addField(formPanel, gbc, row++, "Supplier Name:", editSupplierName);
+        addField(formPanel, gbc, row++, "Contact Number:", editContactNo);
+        addField(formPanel, gbc, row++, "Alternative Contact:", editAltContactNo);
+        addField(formPanel, gbc, row++, "Location ID:", editLocationID);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveBtn = new JButton("Save Changes");
+
+        buttonPanel.add(saveBtn);
+
+        editPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+        editPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        supplierDropdown.addActionListener(e -> {
+            Supplier selected = (Supplier) supplierDropdown.getSelectedItem();
+            if(selected != null) {
+                editSupplierName.setText(selected.getSupplier_name());
+                editContactNo.setText(selected.getContact_no());
+                editAltContactNo.setText(selected.getAlt_contact_no());
+                editLocationID.setText(String.valueOf(selected.getLocation_id()));
+            }
+        });
+
+        // Save changes
+        saveBtn.addActionListener(e -> {
+            try {
+                Supplier selected = (Supplier) supplierDropdown.getSelectedItem();
+                if (selected == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a supplier.");
+                    return;
+                }
+
+                // Create updated supplier object
+                Supplier updatedSupplier = new Supplier();
+                updatedSupplier.setSupplier_id(selected.getSupplier_id()); // Keep the same ID
+                updatedSupplier.setSupplier_name(editSupplierName.getText());
+                updatedSupplier.setContact_no(editContactNo.getText());
+                updatedSupplier.setAlt_contact_no(editAltContactNo.getText());
+                updatedSupplier.setLocation_id(Integer.parseInt(editLocationID.getText()));
+
+                // Use the updateSupplierAll method that takes a Supplier object
+                boolean success = controller.updateSupplierAll(updatedSupplier);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Supplier updated successfully!");
+                    refreshSupplierTable();
+                    // Refresh dropdown
+                    supplierDropdown.removeAllItems();
+                    for (Supplier s : controller.getAllSuppliers()) {
+                        supplierDropdown.addItem(s);
+                    }
+                    // Re-select the updated supplier
+                    for (int i = 0; i < supplierDropdown.getItemCount(); i++) {
+                        if (supplierDropdown.getItemAt(i).getSupplier_id() == selected.getSupplier_id()) {
+                            supplierDropdown.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update supplier.");
+                }
+
+            } 
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+            }
+        });
+    }
+
+    private void deleteSupplier() {
+        int selectedRow = supplierTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a supplier to delete.",
+                    "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete the selected supplier? This may affect related records (e.g., ingredient).",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                int supplierIdToDelete = (int) tableModel.getValueAt(selectedRow, 0);
+
+                if (controller.deleteSupplier(supplierIdToDelete)) {
+                    JOptionPane.showMessageDialog(this, "Supplier deleted successfully.");
+                    refreshSupplierTable();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete supplier. Check database constraints.",
+                            "Deletion Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred during deletion: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+    }
+
 }

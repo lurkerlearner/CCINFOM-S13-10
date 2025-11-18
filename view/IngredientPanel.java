@@ -32,6 +32,8 @@ public class IngredientPanel extends JPanel
     private JTextField supplier_id;
     private JButton addButton;
 
+    private JButton deleteBtn;
+
     // Components for viewing ingredients
     private JTable ingredientTable;
     private DefaultTableModel tableModel;
@@ -44,6 +46,16 @@ public class IngredientPanel extends JPanel
     private JTextField searchField;
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
+
+    // Components for editing ingredients
+    private JTextField editBatchNo;
+    private JTextField editIngredientName;
+    private JComboBox<String> editCategory;
+    private JComboBox<String> editStorageType;
+    private JComboBox<String> editUnit;
+    private JTextField editStockQuantity;
+    private JTextField editExpiryDate;
+    private JTextField editSupplierID;
 
     // Button to go back to main menu
     private JButton mainMenuButton;
@@ -67,10 +79,12 @@ public class IngredientPanel extends JPanel
         createAddPanel();
         createViewPanel();
         createSearchPanel();
+        createEditPanel();
         
         tabbedPane.addTab("Add Ingredient", addPanel);
         tabbedPane.addTab("View All", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
+        tabbedPane.addTab("Edit Ingredient", editPanel);
         
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -252,11 +266,15 @@ public class IngredientPanel extends JPanel
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> refreshIngredientTable());
         
+        deleteBtn = new JButton("Delete Selected");
+        deleteBtn.addActionListener(e -> deleteIngredient());
+
         detailsButton = new JButton("View Details");
         detailsButton.addActionListener(e -> showIngredientDetails());
 
         buttonPanel.add(refreshButton);
         buttonPanel.add(detailsButton);
+        buttonPanel.add(deleteBtn);
         
         viewPanel.add(new JScrollPane(ingredientTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -484,6 +502,184 @@ public class IngredientPanel extends JPanel
                                           JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
+    private void createEditPanel() {
+        editPanel = new JPanel(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 8, 8, 8);
+
+        JComboBox<Ingredient> ingredientDropdown = new JComboBox<>();
+        for (Ingredient i : controller.getAllIngredients()) {
+            ingredientDropdown.addItem(i);
+        }
+        ingredientDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Ingredient ingredient) {
+                    setText(ingredient.getIngredient_id() + " - " + ingredient.getIngredient_name());
+                }
+                return this;
+            }
+        });
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Select Ingredient:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(ingredientDropdown, gbc);
+
+        String[] categories = Arrays.stream(Category.values())
+                                    .map(Category::getDbValue)
+                                    .toArray(String[]::new);
+        
+        String[] storageTypes = Arrays.stream(Storage_type.values())
+                                    .map(Storage_type::getDbValue)
+                                    .toArray(String[]::new);
+        
+        String[] measurementUnits = Arrays.stream(Measurement_unit.values())
+                                    .map(Measurement_unit::getDbValue)
+                                    .toArray(String[]::new);
+
+        editBatchNo = new JTextField(20);
+        editIngredientName = new JTextField(20);
+        editCategory = new JComboBox<>(categories);
+        editStorageType = new JComboBox<>(storageTypes);
+        editUnit = new JComboBox<>(measurementUnits);
+        editStockQuantity = new JTextField(10);
+        editExpiryDate = new JTextField(20);
+        editSupplierID = new JTextField(10);
+
+        int row = 1;
+        addField(formPanel, gbc, row++, "Batch No:", editBatchNo);
+        addField(formPanel, gbc, row++, "Name:", editIngredientName);
+        addField(formPanel, gbc, row++, "Category:", editCategory);
+        addField(formPanel, gbc, row++, "Storage Type:", editStorageType);
+        addField(formPanel, gbc, row++, "Measurement Unit:", editUnit);
+        addField(formPanel, gbc, row++, "Stock Quantity:", editStockQuantity);
+        addField(formPanel, gbc, row++, "Expiry Date:", editExpiryDate);
+        addField(formPanel, gbc, row++, "Supplier ID:", editSupplierID);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveBtn = new JButton("Save Changes");
+
+        buttonPanel.add(saveBtn);
+
+        editPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+        editPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        ingredientDropdown.addActionListener(e -> {
+            Ingredient selected = (Ingredient) ingredientDropdown.getSelectedItem();
+            if(selected != null) {
+                editBatchNo.setText(String.valueOf(selected.getBatch_no()));
+                editIngredientName.setText(selected.getIngredient_name());
+                editCategory.setSelectedItem(selected.getCategory().getDbValue());
+                editStorageType.setSelectedItem(selected.getStorage_type().getDbValue());
+                editUnit.setSelectedItem(selected.getMeasurement_unit().getDbValue());
+                editStockQuantity.setText(String.valueOf(selected.getStock_quantity()));
+                editExpiryDate.setText(selected.getExpiry_date().toString());
+                editSupplierID.setText(String.valueOf(selected.getSupplier_id()));
+            }
+        });
+
+        // Save changes
+        saveBtn.addActionListener(e -> {
+            try {
+                Ingredient selected = (Ingredient) ingredientDropdown.getSelectedItem();
+                if (selected == null) {
+                    JOptionPane.showMessageDialog(this, "Please select an ingredient.");
+                    return;
+                }
+
+                // Create updated ingredient object
+                Ingredient updatedIngredient = new Ingredient();
+                updatedIngredient.setIngredient_id(selected.getIngredient_id()); // Keep the same ID
+                updatedIngredient.setBatch_no(Integer.parseInt(editBatchNo.getText()));
+                updatedIngredient.setIngredient_name(editIngredientName.getText());
+                updatedIngredient.setCategory(Category.fromDbValue((String) editCategory.getSelectedItem()));
+                updatedIngredient.setStorage_type(Storage_type.fromDbValue((String) editStorageType.getSelectedItem()));
+                updatedIngredient.setMeasurement_unit(Measurement_unit.fromDbValue((String) editUnit.getSelectedItem()));
+                updatedIngredient.setStock_quantity(Double.parseDouble(editStockQuantity.getText()));
+                updatedIngredient.setExpiry_date(java.sql.Date.valueOf(editExpiryDate.getText()));
+                updatedIngredient.setSupplier_id(Integer.parseInt(editSupplierID.getText()));
+
+                boolean success = controller.updateIngredient(updatedIngredient);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Ingredient updated successfully!");
+                    refreshIngredientTable();
+                    // Refresh dropdown
+                    ingredientDropdown.removeAllItems();
+                    for (Ingredient i : controller.getAllIngredients()) {
+                        ingredientDropdown.addItem(i);
+                    }
+                    // Re-select the updated ingredient
+                    for (int i = 0; i < ingredientDropdown.getItemCount(); i++) {
+                        if (ingredientDropdown.getItemAt(i).getIngredient_id() == selected.getIngredient_id()) {
+                            ingredientDropdown.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update ingredient.");
+                }
+
+            } 
+            catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+            }
+        });
+    }
+
+    private void deleteIngredient() {
+        int selectedRow = ingredientTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an ingredient to delete.",
+                    "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete the selected ingredient? This may affect related records (e.g., meal ingredient).",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                int ingredientIdToDelete = (int) tableModel.getValueAt(selectedRow, 0);
+
+                if (controller.deleteIngredient(ingredientIdToDelete)) {
+                    JOptionPane.showMessageDialog(this, "Ingredient deleted successfully.");
+                    refreshIngredientTable();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete ingredient. Check database constraints.",
+                            "Deletion Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred during deletion: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+    }
+
 
     
 }

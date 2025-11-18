@@ -4,6 +4,7 @@ import model.*;
 import DAO.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FloodDataController
 {
@@ -111,5 +112,15 @@ public class FloodDataController
     public ArrayList<Object[]> getRoadRestrictionFrequency() 
     {
         return flooddataDAO.getRoadRestrictionFrequency();
+    }
+
+    public ArrayList<FloodImpactReport> getQuarterlyReport(int y, int q) 
+    {
+        return flooddataDAO.generateFloodImpactReportQTR(y, q);
+    }
+
+    public ArrayList<FloodImpactReport> getAnnualReport(int y) 
+    {
+        return flooddataDAO.generateFloodImpactReportYEAR(y);
     }
 }

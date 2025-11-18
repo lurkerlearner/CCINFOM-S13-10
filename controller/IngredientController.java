@@ -30,6 +30,10 @@ public class IngredientController {
         return ingredientDAO.addIngredient(ingredient);
     }
 
+    public boolean deleteIngredient(int ingredient_id) {
+        return ingredientDAO.deleteIngredient(ingredient_id);
+    }
+
     public boolean updateIngredient(Ingredient ingredient) {
         return ingredientDAO.updateIngredientAll(ingredient);
     }
