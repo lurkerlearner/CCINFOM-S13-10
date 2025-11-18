@@ -133,6 +133,25 @@ public class LocationDAO {
         return locations;
     }
 
+    public boolean deleteLocation(int locationId) {
+        String sql = "DELETE FROM LOCATION WHERE location_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, locationId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // This happens if there are dependent clients, suppliers, or flood_data
+            System.err.println("Cannot delete location due to related records: " + e.getMessage());
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
     private Location mapResultSetToLocation(ResultSet rs) throws SQLException {
         return new Location(
                 rs.getInt("location_id"),

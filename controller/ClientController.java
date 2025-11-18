@@ -3,6 +3,7 @@ package controller;
 import DAO.*;
 import model.*;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class ClientController {
 
+    private Client client;
     private ClientDAO clientDAO;
     private LocationDAO locationDAO;
 
@@ -68,18 +70,40 @@ public class ClientController {
     public List<Client> searchClientsByContact(String contactNo) {
         return clientDAO.searchClients("contact", contactNo);
     }
-/*
-    public Client getClientById(int clientId) {
-        Client client = clientDAO.getClientById(clientId);
-        if (client != null) {
 
-            int locId = client.getLocationID();
-            Location location = locationDAO.getLocationById(locId);
-            client.setLocationID(location);
-        }
-        return client;
+    public boolean deleteClient(int clientId) {
+        return clientDAO.deleteClient(clientId);
     }
-*/
+
+    public boolean updateClientBasicInfo(int clientId,
+                                         String name,
+                                         String contact,
+                                         String password,
+                                         String unit,
+                                         int planId,
+                                         int locationId) {
+        try {
+            return clientDAO.updateClientBasicInfo(clientId, name, contact, password, unit, planId, locationId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateClientDietPreferences(int clientId, List<Integer> dietIds) {
+        try {
+            return clientDAO.updateClientDietPreferences(clientId, dietIds);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Integer> getDietPreferenceIDs(int clientId) {
+        return clientDAO.getClientDietPreferences(clientId);
+    }
+
+
 
 }
 

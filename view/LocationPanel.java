@@ -28,6 +28,7 @@ public class LocationPanel extends JPanel {
     private DefaultTableModel searchTableModel;
     private JButton searchBtn;
     private JButton searchDetailsBtn;
+    private JButton deleteBtn;
 
     private JButton mainMenuButton;
 
@@ -115,6 +116,9 @@ public class LocationPanel extends JPanel {
         refreshBtn = new JButton("Refresh");
         refreshBtn.addActionListener(e -> refreshLocationTable());
         buttonPanel.add(refreshBtn);
+        deleteBtn = new JButton("Delete Selected");
+        deleteBtn.addActionListener(e->deleteLocation());
+        buttonPanel.add(deleteBtn);
 
         viewPanel.add(new JScrollPane(locationTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -236,4 +240,40 @@ public class LocationPanel extends JPanel {
 
         JOptionPane.showMessageDialog(this, scroll, "Location Details", JOptionPane.INFORMATION_MESSAGE);
     }
+
+    private void deleteLocation() {
+        int selectedRow = locationTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a location to delete.",
+                    "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete the selected location? This may affect related clients, suppliers, or flood data.",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                int locationIdToDelete = (int) locationTableModel.getValueAt(selectedRow, 0);
+
+                if (controller.deleteLocation(locationIdToDelete)) {
+                    JOptionPane.showMessageDialog(this, "Location deleted successfully.");
+                    refreshLocationTable();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete location. Check database constraints.",
+                            "Deletion Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred during deletion: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+
+
 }

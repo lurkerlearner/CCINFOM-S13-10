@@ -156,10 +156,6 @@ CREATE TABLE IF NOT EXISTS CLIENT_DIET_PREFERENCE (
         ON UPDATE CASCADE
 );
 
-INSERT INTO diet_preference (diet_preference_id,diet_name, description)
-VALUES (1, 'Standard Diet', 'Default diet preference for new users')
-ON DUPLICATE KEY UPDATE diet_name = diet_name;
-
 INSERT INTO DIET_PREFERENCE (diet_name, description) VALUES
 ('Vegan','No animal products'),
 ('Vegetarian','No meat'),
@@ -172,9 +168,6 @@ INSERT INTO DIET_PREFERENCE (diet_name, description) VALUES
 ('Diabetic-Friendly','Low sugar'),
 ('Low Fat','Reduced fat intake');
 
-INSERT INTO meal_plan (plan_id, plan_name, description, total_price)
-VALUES (1, 'Default Plan', 'Used for registration', 0.00)
-ON DUPLICATE KEY UPDATE plan_name = plan_name;
 INSERT INTO MEAL_PLAN (plan_name, description, total_price) VALUES
 ('Vegan Starter','A starter vegan meal plan',500),
 ('High Protein Plan','Protein-packed meals',1200),
@@ -335,30 +328,6 @@ INSERT INTO MEAL_INGREDIENT (meal_id, ingredient_id, quantity) VALUES
 (11, 10, 30);  -- Eggs
 
 
-SELECT * FROM SUPPLIER;
-SELECT * FROM INGREDIENT;
-SELECT * FROM MEAL_PLAN;
-SELECT * FROM MEAL;
-
-SET FOREIGN_KEY_CHECKS = 0;
-
-TRUNCATE TABLE meal_ingredient;
-TRUNCATE TABLE ingredient;
-ALTER TABLE ingredient AUTO_INCREMENT = 1;
-
-TRUNCATE TABLE supplier;
-ALTER TABLE supplier AUTO_INCREMENT = 1;
-
--- Truncate other dependent tables if needed
-TRUNCATE TABLE meal;
-ALTER TABLE meal AUTO_INCREMENT = 1;
-
-TRUNCATE TABLE delivery;
-ALTER TABLE delivery AUTO_INCREMENT = 1;
-
-SET FOREIGN_KEY_CHECKS = 1;
-
-SELECT * FROM MEAL_INGREDIENT;
 
 -- -------------------
 -- DELIVERY
@@ -429,4 +398,73 @@ INSERT INTO flood_data (flood_factor, avg_water_level, affected_households, road
 ('MODERATE', 1.25, 45, 'Partially Flooded', TRUE, 'Tikling Tricycle', 9);
 
 SELECT * FROM flood_data;
+
+-- CLIENT_DIET_PREFERENCE
+-- -------------------
+INSERT INTO CLIENT_DIET_PREFERENCE (diet_preference_id, client_id) VALUES
+(1,1),(3,1),(8,2),(2,2),(5,3),(4,3),(6,4),(9,5),(7,6),(2,7),(5,8),(3,9);
+
+SELECT * FROM client_diet_preference;
+SELECT * FROM client;
+
+SELECT * FROM client;
+
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM INGREDIENT;
+ALTER TABLE INGREDIENT AUTO_INCREMENT = 1;
+SET SQL_SAFE_UPDATES = 1;
+
+ALTER TABLE INGREDIENT 
+MODIFY COLUMN measurement_unit ENUM('grams', 'millilitres');
+
+INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, measurement_unit, stock_quantity, expiry_date, supplier_id) VALUES
+(101,'Chicken Breast','Protein','Refrigerated','grams',5000,'2025-12-31',3),
+(102,'Salmon Fillet','Protein','Frozen','grams',2000,'2025-11-30',3),
+(103,'Broccoli','Produce','Refrigerated','grams',3000,'2025-11-20',2),
+(104,'Spinach','Produce','Refrigerated','grams',1500,'2025-11-18',6),
+(105,'Olive Oil','Fat','Dry','millilitres',100,'2026-01-31',5),
+(106,'Cheddar Cheese','Dairy','Refrigerated','grams',800,'2025-12-15',4),
+(107,'Brown Rice','Grains','Dry','grams',10000,'2026-03-31',5),
+(108,'Almonds','Protein','Dry','grams',2000,'2026-02-28',9),
+(109,'Tomatoes','Produce','Refrigerated','grams',2500,'2025-11-25',2),
+(110,'Eggs','Protein','Refrigerated','grams',1000,'2025-12-31',4),
+(111,'Beef Sirloin','Protein','Refrigerated','grams',4000,'2025-12-15',3);
+
+-- Drop existing triggers if they exist (for clean setup)
+DROP TRIGGER IF EXISTS update_restock_status_before_insert;
+DROP TRIGGER IF EXISTS update_restock_status_before_update;
+
+-- Trigger for INSERT operations
+DELIMITER //
+CREATE TRIGGER update_restock_status_before_insert
+BEFORE INSERT ON INGREDIENT
+FOR EACH ROW
+BEGIN
+    IF NEW.stock_quantity = 0 THEN
+        SET NEW.restock_status = 'Out of Stock';
+    ELSEIF NEW.stock_quantity > 0 AND NEW.stock_quantity <= 1000 THEN
+        SET NEW.restock_status = 'Low Stock';
+    ELSE
+        SET NEW.restock_status = 'Available';
+    END IF;
+END//
+DELIMITER ;
+
+-- Trigger for UPDATE operations
+DELIMITER //
+CREATE TRIGGER update_restock_status_before_update
+BEFORE UPDATE ON INGREDIENT
+FOR EACH ROW
+BEGIN
+    IF NEW.stock_quantity = 0 THEN
+        SET NEW.restock_status = 'Out of Stock';
+    ELSEIF NEW.stock_quantity > 0 AND NEW.stock_quantity <= 1000 THEN
+        SET NEW.restock_status = 'Low Stock';
+    ELSE
+        SET NEW.restock_status = 'Available';
+    END IF;
+END//
+DELIMITER ;
+
+
 

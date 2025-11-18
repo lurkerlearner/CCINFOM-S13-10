@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9cd77863-6cba-441f-a7e5-0a3e5179b3d4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DAO/ClientEngagementDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controller/ClientEngagementController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/view/ClientEngagementPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/GenerateReportFrame.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/GenerateReportFrame.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/GenerateReportFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/GenerateReportFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DAO/ClientDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DAO/ClientDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/controller/ClientController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/ClientPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/ClientPanel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +58,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/faith/Downloads/CCINFOM&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;discord-application&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Console Colors&quot;
   },
   &quot;keyToStringList&quot;: {
     &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
