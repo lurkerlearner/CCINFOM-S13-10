@@ -2,6 +2,8 @@ package controller;
 
 import DAO.*;
 import model.*;
+
+import java.sql.SQLException;
 import java.util.*;
 
 public class LocationController {
@@ -52,5 +54,18 @@ public class LocationController {
     public Location getLocationById(int id) {
         return locationDAO.getLocationById(id);
     }
+
+    public boolean updateLocationInfo(int location_id,
+                                      String street,
+                                      String city,
+                                      String zip){
+        try {
+            return locationDAO.updateLocationInfo(location_id,street,city,zip);
+        } catch (SQLException e) {
+            e.printStackTrace();;
+            return false;
+        }
+    }
+
 }
 

@@ -6,13 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="9cd77863-6cba-441f-a7e5-0a3e5179b3d4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAO/ClientDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DAO/ClientDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/view/ClientPanel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/ClientPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/ClientPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DAO/LocationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DAO/LocationDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/controller/LocationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/app/floodpanda.sql" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/app/floodpanda.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/resources/salmon_bowl.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CCINFOM_DBAPP/resources/salmon_bowl.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/LocationPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/view/LocationPanel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,12 +33,12 @@
     &quot;assignee&quot;: &quot;elisha-mek&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/lurkerlearner/CCINFOM_DBAPP.git&quot;,
-    &quot;accountId&quot;: &quot;0fe28263-d8e1-48bc-a530-d0ba67c95d63&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/lurkerlearner/CCINFOM-S13-10.git",
+    "accountId": "0fe28263-d8e1-48bc-a530-d0ba67c95d63"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>

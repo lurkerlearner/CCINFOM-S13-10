@@ -141,12 +141,35 @@ public class LocationDAO {
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLIntegrityConstraintViolationException e) {
-            // This happens if there are dependent clients, suppliers, or flood_data
+            // this happens if there are dependent clients, suppliers, or flood_data
             System.err.println("Cannot delete location due to related records: " + e.getMessage());
             return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public boolean updateLocationInfo(int location_id,
+                                         String street,
+                                         String city,
+                                         String zip) throws SQLException {
+
+        String sql = """
+        UPDATE LOCATION
+        SET street_address = ?, city = ?, zip_code = ?
+        WHERE location_id = ?
+    """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, street);
+            ps.setString(2, city);
+            ps.setString(3, zip);
+            ps.setInt(4, location_id);
+
+            return ps.executeUpdate() > 0;
         }
     }
 

@@ -23,12 +23,14 @@ public class LocationPanel extends JPanel {
     private DefaultTableModel locationTableModel;
 
     private JComboBox<String> searchTypeDropdown;
+    private JComboBox<Location> locationDropdown;
     private JTextField searchField;
     private JTable searchTable;
     private DefaultTableModel searchTableModel;
     private JButton searchBtn;
     private JButton searchDetailsBtn;
     private JButton deleteBtn;
+
 
     private JButton mainMenuButton;
 
@@ -51,6 +53,12 @@ public class LocationPanel extends JPanel {
         tabbedPane.addTab("Search Locations", searchPanel);
         tabbedPane.addTab("Edit Locations", editPanel);
 
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedComponent() == editPanel) {
+                reloadLocationDropdown();
+            }
+        });
+
         add(tabbedPane, BorderLayout.CENTER);
     }
 
@@ -67,7 +75,7 @@ public class LocationPanel extends JPanel {
         cityField = new JTextField(20);
         zipField = new JTextField(20);
 
-        int row = 0;
+        int row = 1;
         addField(formPanel, gbc, row++, "Street:", streetField);
         addField(formPanel, gbc, row++, "City:", cityField);
         addField(formPanel, gbc, row++, "ZIP Code:", zipField);
@@ -164,7 +172,87 @@ public class LocationPanel extends JPanel {
         editPanel = new JPanel(new BorderLayout());
         editPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        //todo:IMPLEMENT EDIT
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8,8,8,8);
+
+        locationDropdown = new JComboBox<>();
+        for (Location l : controller.getAllLocations()) {
+            locationDropdown.addItem(l);
+        }
+
+        locationDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Location location) {
+                    setText(location.getLocationId() + " - " + location.getStreet() + ", " + location.getCity());
+                }
+                return this;
+            }
+        });
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Select Location:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(locationDropdown, gbc);
+
+        JTextField editStreetField = new JTextField(20);
+        JTextField editCityField = new JTextField(20);
+        JTextField editZipField = new JTextField(20);
+
+        int row = 1;
+        addField(formPanel, gbc, row++, "Street:", editStreetField);
+        addField(formPanel, gbc, row++, "City:", editCityField);
+        addField(formPanel, gbc, row++, "ZIP Code:", editZipField);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveBtn = new JButton("Save Changes");
+
+        buttonPanel.add(saveBtn);
+        editPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+        editPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        locationDropdown.addActionListener(e -> {
+            Location selected = (Location) locationDropdown.getSelectedItem();
+            if (selected != null) {
+                editStreetField.setText(selected.getStreet());
+                editCityField.setText(selected.getCity());
+                editZipField.setText(selected.getZip());
+            }
+        });
+
+
+
+        saveBtn.addActionListener(e->{
+            try{
+                Location selected = (Location) locationDropdown.getSelectedItem();
+                if (selected == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a location.");
+                    return;
+                }
+
+                String newStreet = editStreetField.getText();
+                String newCity = editCityField.getText();
+                String newZip = editZipField.getText();
+
+                boolean ok = controller.updateLocationInfo(selected.getLocationId(), newStreet, newCity, newZip);
+
+                if (ok) {
+                    JOptionPane.showMessageDialog(this,"Location updated successfully!");
+                    refreshLocationTable();
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Failed to update location.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+            }
+        });
+
+
     }
 
     private void addLocation() {
@@ -273,6 +361,14 @@ public class LocationPanel extends JPanel {
             }
         }
     }
+
+    private void reloadLocationDropdown() {
+        locationDropdown.removeAllItems();
+        for (Location l : controller.getAllLocations()) {
+            locationDropdown.addItem(l);
+        }
+    }
+
 
 
 
