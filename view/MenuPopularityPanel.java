@@ -64,7 +64,7 @@ public class MenuPopularityPanel extends JPanel {
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Enter Monthly Report Parameters"));
         monthlyInputYear = new JTextField(10);
-        monthlyInputMonth = new JTextField(10);
+        monthlyInputMonth = new JTextField(5);
 
         inputPanel.add(new JLabel("Year: "));
         inputPanel.add(monthlyInputYear);
@@ -94,7 +94,7 @@ public class MenuPopularityPanel extends JPanel {
             new AdminMainMenu().setVisible(true);
         });
 
-        monthlyGenerateButton = new JButton("Generate Report");
+        monthlyGenerateButton = new JButton("Generate Monthly Report");
         monthlyGenerateButton.addActionListener(e -> generateMonthlyReport());
 
         buttonPanel.add(monthlyGenerateButton);
