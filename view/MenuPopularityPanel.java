@@ -179,8 +179,8 @@ public class MenuPopularityPanel extends JPanel {
             for (MealPerformance mp : rows) {
                 monthlyTableModel.addRow(new Object[]{
 
-                    mp.getMeal_id(),
-                    mp.getMeal_name(),
+                    mp.getMealId(),
+                    mp.getMealName(),
                     mp.getTimesOrdered(),
                     mp.getTotalRevenue(),
                     mp.getDistinctLocations()
@@ -218,10 +218,10 @@ public class MenuPopularityPanel extends JPanel {
         List<MealPerformance> rows = mealController.getMealPerformanceByYear(year);
             
         for (MealPerformance mp : rows) {
-                monthlyTableModel.addRow(new Object[]{
+                annualTableModel.addRow(new Object[]{
 
-                    mp.getMeal_id(),
-                    mp.getMeal_name(),
+                    mp.getMealId(),
+                    mp.getMealName(),
                     mp.getTimesOrdered(),
                     mp.getTotalRevenue(),
                     mp.getDistinctLocations()
