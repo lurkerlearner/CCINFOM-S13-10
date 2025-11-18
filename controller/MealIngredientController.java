@@ -20,6 +20,14 @@ public class MealIngredientController {
         return mealIngredientDAO.addMealIngredient(mealIngredient);
     }
 
+    public boolean updateMealIngredientQuantity(MealIngredient mealIngredient) {
+        return mealIngredientDAO.updateMealIngredientQuantity(mealIngredient);
+    }
+
+    public boolean deleteMealIngredient(int meal_id, int ingredient_id) {
+        return mealIngredientDAO.deleteMealIngredient(meal_id, ingredient_id);
+    }
+
     public ArrayList<MealIngredient> getAllMealIngredients() {
         return mealIngredientDAO.getAllMealIngredients();
     }

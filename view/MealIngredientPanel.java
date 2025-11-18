@@ -18,12 +18,15 @@ public class MealIngredientPanel extends JPanel
     private JPanel addPanel;
     private JPanel viewPanel;
     private JPanel searchPanel;
+    private JPanel editPanel;
 
     // Components for adding ingredients
     private JTextField meal_id;
     private JTextField ingredient_id;
     private JTextField quantity;
     private JButton addButton;
+
+    private JButton deleteBtn;
 
     // Components for viewing meal ingredients
     private JTable mealIngredientTable;
@@ -36,6 +39,11 @@ public class MealIngredientPanel extends JPanel
     private JTextField searchField;
     private JTable searchResultTable;
     private DefaultTableModel searchTableModel;
+
+    // Components for editing (meal id and ingredient id are view only tho) 
+    private JTextField editMealId;
+    private JTextField editIngredientId;
+    private JTextField editQuantity;
 
     // Button to go back to main menu
     private JButton mainMenuButton;
@@ -59,10 +67,12 @@ public class MealIngredientPanel extends JPanel
         createAddPanel();
         createViewPanel();
         createSearchPanel();
+        createEditPanel();
         
         tabbedPane.addTab("Add Record", addPanel);
         tabbedPane.addTab("View All", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
+        tabbedPane.addTab("Edit Relationship", editPanel);
         
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -187,10 +197,14 @@ public class MealIngredientPanel extends JPanel
         
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> refreshMealIngredientTable());
+
+        deleteBtn = new JButton("Delete Selected");
+        deleteBtn.addActionListener(e -> deleteMealIngredient());
         
         // no view details
 
         buttonPanel.add(refreshButton);
+        buttonPanel.add(deleteBtn);
         
         viewPanel.add(new JScrollPane(mealIngredientTable), BorderLayout.CENTER);
         viewPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -329,6 +343,157 @@ public class MealIngredientPanel extends JPanel
                                         "No Results", JOptionPane.INFORMATION_MESSAGE);
         }
 
+    }
+
+    private void createEditPanel() {
+        editPanel = new JPanel(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 8, 8, 8);
+
+        JComboBox<MealIngredient> recordDropdown = new JComboBox<>();
+        for (MealIngredient mi : controller.getAllMealIngredients()) {
+            recordDropdown.addItem(mi);
+        }
+        recordDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof MealIngredient mealIngredient) {
+                    setText("Meal " + mealIngredient.getMeal_id() + " - Ingredient " + mealIngredient.getIngredient_id());
+                }
+                return this;
+            }
+        });
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Select Record:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(recordDropdown, gbc);
+
+        // Create read-only fields for meal ID and ingredient ID (since they're the primary key)
+        editMealId = new JTextField(10);
+        editMealId.setEditable(false); // Cannot change primary key
+        editIngredientId = new JTextField(10);
+        editIngredientId.setEditable(false); // Cannot change primary key
+        editQuantity = new JTextField(10);
+
+        int row = 1;
+        addField(formPanel, gbc, row++, "Meal ID:", editMealId);
+        addField(formPanel, gbc, row++, "Ingredient ID:", editIngredientId);
+        addField(formPanel, gbc, row++, "Quantity:", editQuantity);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveBtn = new JButton("Save Changes");
+
+        buttonPanel.add(saveBtn);
+
+        editPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+        editPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        recordDropdown.addActionListener(e -> {
+            MealIngredient selected = (MealIngredient) recordDropdown.getSelectedItem();
+            if(selected != null) {
+                editMealId.setText(String.valueOf(selected.getMeal_id()));
+                editIngredientId.setText(String.valueOf(selected.getIngredient_id()));
+                editQuantity.setText(String.valueOf(selected.getQuantity()));
+            }
+        });
+
+        // Save changes
+        saveBtn.addActionListener(e -> {
+            try {
+                MealIngredient selected = (MealIngredient) recordDropdown.getSelectedItem();
+                if (selected == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a record.");
+                    return;
+                }
+
+                // Create updated meal ingredient object
+                MealIngredient updatedMealIngredient = new MealIngredient();
+                updatedMealIngredient.setMeal_id(selected.getMeal_id()); // Keep the same meal ID
+                updatedMealIngredient.setIngredient_id(selected.getIngredient_id()); // Keep the same ingredient ID
+                updatedMealIngredient.setQuantity(Double.parseDouble(editQuantity.getText()));
+
+                boolean success = controller.updateMealIngredientQuantity(updatedMealIngredient);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Record updated successfully!");
+                    refreshMealIngredientTable();
+                    // Refresh dropdown
+                    recordDropdown.removeAllItems();
+                    for (MealIngredient mi : controller.getAllMealIngredients()) {
+                        recordDropdown.addItem(mi);
+                    }
+                    // Re-select the updated record
+                    for (int i = 0; i < recordDropdown.getItemCount(); i++) {
+                        MealIngredient current = recordDropdown.getItemAt(i);
+                        if (current.getMeal_id() == selected.getMeal_id() && 
+                            current.getIngredient_id() == selected.getIngredient_id()) {
+                            recordDropdown.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update record.");
+                }
+
+            } 
+            catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+            }
+        });
+    }
+
+    private void deleteMealIngredient() {
+        int selectedRow = mealIngredientTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a record to delete.",
+                    "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete the selected record? " + 
+                "This would mean there's no relationship between this meal and ingredient",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                int mealIdToDelete = (int) tableModel.getValueAt(selectedRow, 0);
+                int ingredientIdToDelete = (int) tableModel.getValueAt(selectedRow, 1);
+
+                if (controller.deleteMealIngredient(mealIdToDelete, ingredientIdToDelete)) {
+                    JOptionPane.showMessageDialog(this, "Record deleted successfully.");
+                    refreshMealIngredientTable();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete record. Check database constraints.",
+                            "Deletion Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred during deletion: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
     }
 
     

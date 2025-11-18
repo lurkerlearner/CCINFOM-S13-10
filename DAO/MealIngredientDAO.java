@@ -38,7 +38,7 @@ public class MealIngredientDAO {
         }
     }
 
-    public boolean updateMealIngredient(MealIngredient mealIngredient) {
+    public boolean updateMealIngredientQuantity(MealIngredient mealIngredient) {
         String sqlQuery = "UPDATE MEAL_INGREDIENT SET quantity = ? WHERE meal_id = ? AND ingredient_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
