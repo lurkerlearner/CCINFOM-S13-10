@@ -162,8 +162,8 @@ public String updateMeal(int mealId, String name, float price, float cost, int p
         return mealDAO.getMealPerformanceByMonthYear(year, month);
     }
 
-    public List<MealPerformance> getMealPerformaceByYear(int year) {
-        return mealDAO.getMealPerformaceByYear(year);
+    public List<MealPerformance> getMealPerformanceByYear(int year) {
+        return mealDAO.getMealPerformanceByYear(year);
     }
 
 }

@@ -11,7 +11,6 @@ public class Meal {
     private String nutrients;
     private String date_added;
     private int diet_preference_id;
-    private String imagePath;
 
 
 
@@ -27,7 +26,6 @@ public class Meal {
         this.nutrients = nutrients;
         this.date_added = date_added;
         this.diet_preference_id = diet_preference_id;
-        this.imagePath = null;
     }
 
 public Meal() {}
@@ -67,9 +65,6 @@ public Meal() {}
     public int getDiet_preference_id() {
         return diet_preference_id;
     }
-    public String getImagePath() {
-        return imagePath;
-    }
 
 
     public void setPrice(float price) {
@@ -98,9 +93,6 @@ public Meal() {}
 
     public void setPreparation_time(int preparation_time) {
         this.preparation_time = preparation_time;
-    }
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
 }
