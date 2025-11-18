@@ -244,18 +244,7 @@ INSERT INTO MEAL (meal_name, price, cost, nutrients, calories, preparation_time,
 
 SELECT * FROM MEAL;
 
-INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, measurement_unit, stock_quantity, expiry_date, restock_status, supplier_id) VALUES
-(101,'Chicken Breast','Protein','Refrigerated','grams',5000,'2025-12-31','Available',3),
-(102,'Salmon Fillet','Protein','Frozen','grams',2000,'2025-11-30','Low Stock',3),
-(103,'Broccoli','Produce','Refrigerated','grams',3000,'2025-11-20','Available',2),
-(104,'Spinach','Produce','Refrigerated','grams',1500,'2025-11-18','Low Stock',6),
-(105,'Olive Oil','Fat','Dry','litres',100,'2026-01-31','Available',5),
-(106,'Cheddar Cheese','Dairy','Refrigerated','grams',800,'2025-12-15','Available',4),
-(107,'Brown Rice','Grains','Dry','grams',10000,'2026-03-31','Available',5),
-(108,'Almonds','Protein','Dry','grams',2000,'2026-02-28','Available',9),
-(109,'Tomatoes','Produce','Refrigerated','grams',2500,'2025-11-25','Available',2),
-(110,'Eggs','Protein','Refrigerated','grams',1000,'2025-12-31','Available',4),
-(111, 'Beef Sirloin', 'Protein', 'Refrigerated', 'grams', 4000, '2025-12-15', 'Available', 3);
+
 
 INSERT INTO DIET_PREFERENCE (diet_name, description) VALUES
 ('Vegan','No animal products'),
@@ -326,8 +315,6 @@ INSERT INTO MEAL_INGREDIENT (meal_id, ingredient_id, quantity) VALUES
 -- 11. Protein Shake
 (11, 8, 50),   -- Almonds
 (11, 10, 30);  -- Eggs
-
-
 
 -- -------------------
 -- DELIVERY
@@ -417,19 +404,6 @@ SET SQL_SAFE_UPDATES = 1;
 ALTER TABLE INGREDIENT 
 MODIFY COLUMN measurement_unit ENUM('grams', 'millilitres');
 
-INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, measurement_unit, stock_quantity, expiry_date, supplier_id) VALUES
-(101,'Chicken Breast','Protein','Refrigerated','grams',5000,'2025-12-31',3),
-(102,'Salmon Fillet','Protein','Frozen','grams',2000,'2025-11-30',3),
-(103,'Broccoli','Produce','Refrigerated','grams',3000,'2025-11-20',2),
-(104,'Spinach','Produce','Refrigerated','grams',1500,'2025-11-18',6),
-(105,'Olive Oil','Fat','Dry','millilitres',100,'2026-01-31',5),
-(106,'Cheddar Cheese','Dairy','Refrigerated','grams',800,'2025-12-15',4),
-(107,'Brown Rice','Grains','Dry','grams',10000,'2026-03-31',5),
-(108,'Almonds','Protein','Dry','grams',2000,'2026-02-28',9),
-(109,'Tomatoes','Produce','Refrigerated','grams',2500,'2025-11-25',2),
-(110,'Eggs','Protein','Refrigerated','grams',1000,'2025-12-31',4),
-(111,'Beef Sirloin','Protein','Refrigerated','grams',4000,'2025-12-15',3);
-
 -- Drop existing triggers if they exist (for clean setup)
 DROP TRIGGER IF EXISTS update_restock_status_before_insert;
 DROP TRIGGER IF EXISTS update_restock_status_before_update;
@@ -465,6 +439,19 @@ BEGIN
     END IF;
 END//
 DELIMITER ;
+
+INSERT INTO INGREDIENT (batch_no, ingredient_name, category, storage_type, measurement_unit, stock_quantity, expiry_date, supplier_id) VALUES
+(101,'Chicken Breast','Protein','Refrigerated','grams',5000,'2025-12-31',3),
+(102,'Salmon Fillet','Protein','Frozen','grams',2000,'2025-11-30',3),
+(103,'Broccoli','Produce','Refrigerated','grams',3000,'2025-11-20',2),
+(104,'Spinach','Produce','Refrigerated','grams',1500,'2025-11-18',6),
+(105,'Olive Oil','Fat','Dry','millilitres',100,'2026-01-31',5),
+(106,'Cheddar Cheese','Dairy','Refrigerated','grams',800,'2025-12-15',4),
+(107,'Brown Rice','Grains','Dry','grams',10000,'2026-03-31',5),
+(108,'Almonds','Protein','Dry','grams',2000,'2026-02-28',9),
+(109,'Tomatoes','Produce','Refrigerated','grams',2500,'2025-11-25',2),
+(110,'Eggs','Protein','Refrigerated','grams',1000,'2025-12-31',4),
+(111,'Beef Sirloin','Protein','Refrigerated','grams',4000,'2025-12-15',3);
 
 
 
