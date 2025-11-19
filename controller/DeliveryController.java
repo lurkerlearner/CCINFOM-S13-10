@@ -161,8 +161,8 @@ public class DeliveryController
             {
                 JOptionPane.showMessageDialog(null, 
                 "Insufficient ingredients for the selected meal. " +
-                "Order cannot be placed." +
-                "Choose a different meal or try again later.");
+                "Order cannot be placed. " +
+                "\nChoose a different meal or try again later.");
                 c.rollback();
                 return false;
             }
