@@ -11,34 +11,54 @@ public class FloodPandaWelcome extends JFrame {
         setSize(600, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setOpaque(true);
+        wrapper.setBackground(Color.WHITE);
+        add(wrapper);
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setOpaque(false);
 
 
-        JLabel title = new JLabel("FloodPanda", SwingConstants.CENTER);
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel(logoIcon);
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("FloodPanda");
         title.setFont(new Font("Arial", Font.BOLD, 36));
         title.setForeground(new Color(220, 31, 127));
-        title.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setOpaque(false);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topPanel.add(logoLabel);
+        topPanel.add(Box.createVerticalStrut(10));
+        topPanel.add(title);
 
 
-        //==BUTTONS
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-
+        //buttons
         JButton login = new JButton("Login");
         JButton register = new JButton("Create New Account");
         JButton admin = new JButton("Admin Module");
         JButton exit = new JButton("Exit");
 
+        JButton[] buttons = { login, register, admin, exit };
+        Dimension buttonSize = new Dimension(400, 65);
 
-        Dimension buttonSize = new Dimension(400, 80);
-        JButton[] buttons = {login, register, admin, exit};
         for (JButton b : buttons) {
             b.setPreferredSize(buttonSize);
             b.setMaximumSize(buttonSize);
             b.setMinimumSize(buttonSize);
-            b.setFont(new Font("Arial", Font.BOLD, 16));
 
+            b.setFont(new Font("Arial", Font.BOLD, 16));
             b.setBackground(new Color(255, 214, 221));
             b.setOpaque(true);
             b.setContentAreaFilled(true);
@@ -46,8 +66,11 @@ public class FloodPandaWelcome extends JFrame {
             b.setBorder(BorderFactory.createLineBorder(Color.PINK, 2));
         }
 
-        //==PANG SPACING
-        buttonPanel.add(Box.createVerticalGlue());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         buttonPanel.add(login);
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(register);
@@ -55,15 +78,13 @@ public class FloodPandaWelcome extends JFrame {
         buttonPanel.add(admin);
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(exit);
-        buttonPanel.add(Box.createVerticalGlue());
 
+        content.add(topPanel);
+        content.add(Box.createVerticalStrut(30));
+        content.add(buttonPanel);
 
-        JPanel centerWrapper = new JPanel(new GridBagLayout());
-        centerWrapper.add(buttonPanel);
+        wrapper.add(content, new GridBagConstraints());
 
-        add(centerWrapper, BorderLayout.CENTER);
-
-        //==ACTION LISTENERS
         login.addActionListener(e -> {
             new LoginScreen().setVisible(true);
             dispose();
@@ -74,7 +95,7 @@ public class FloodPandaWelcome extends JFrame {
             dispose();
         });
 
-        admin.addActionListener(e->{
+        admin.addActionListener(e -> {
             new AdminLoginScreen().setVisible(true);
             dispose();
         });
@@ -84,4 +105,3 @@ public class FloodPandaWelcome extends JFrame {
         setVisible(true);
     }
 }
-

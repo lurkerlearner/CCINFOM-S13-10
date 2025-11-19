@@ -203,5 +203,4 @@ public class ForgotPasswordScreen extends JFrame {
             JOptionPane.showMessageDialog(this, "Failed to update password.");
         }
     }
-
 }
