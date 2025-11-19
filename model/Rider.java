@@ -58,4 +58,13 @@ public class Rider
     {
         this.contact_no = contact_no;
     }
+
+    @Override
+    public String toString() 
+    {
+        return  "Rider ID: " + rider_id + "\n" +
+                "Ride Name: " + rider_name + "\n" +
+                "Hire Date: " + hire_date + "\n" +
+                "Contact No.: " + contact_no;
+    }
 }
