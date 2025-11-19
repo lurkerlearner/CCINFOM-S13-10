@@ -353,7 +353,7 @@ public class IngredientPanel extends JPanel
         // add Expiring Soon, Restock status (available, low, out of stock) options if needed
         searchTypeComboBox = new JComboBox<>(new String[] {
             "By Ingredient ID", "By Category", "By Batch No", "By Supplier ID",
-            "By Nearest Expiry Dates", "By Restock Status", "By  Storage Type"
+            "By Nearest Expiry Dates", "By Restock Status", "By Storage Type"
         });
 
         searchField = new JTextField(15);

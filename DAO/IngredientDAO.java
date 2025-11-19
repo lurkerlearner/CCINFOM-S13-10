@@ -393,7 +393,7 @@ public class IngredientDAO {
              PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
             
-            stmt.setString(1, category.name()); // convert enum to string
+            stmt.setString(1, category.getDbValue()); 
             
             try(ResultSet rs = stmt.executeQuery()) 
             {
@@ -470,7 +470,7 @@ public class IngredientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
-            stmt.setString(1, status.name());
+            stmt.setString(1, status.getDbValue());
             try(ResultSet rs = stmt.executeQuery())
             {
                 // go thru each row and add it to the arraylist    
@@ -508,7 +508,7 @@ public class IngredientDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlQuery)) 
         {
-            stmt.setString(1, storage_type.name());
+            stmt.setString(1, storage_type.getDbValue());
 
             try(ResultSet rs = stmt.executeQuery())
             {
