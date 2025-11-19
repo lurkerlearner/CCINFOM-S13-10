@@ -193,16 +193,16 @@ public class MealDAO {
 
      public List<MealPerformance> getMealPerformanceByMonthYear(int year, int month){
         List<MealPerformance> report = new ArrayList<>();
-        String query = "SELECT m.meal_id, m.meal_name, COUNT(md.transaction_id) AS TimesOrdered, " +
-                       " (COUNT(md.transaction_id) * m.price) AS TotalRevenue, " +
-                       " COUNT(DISTINCT c.location_id) AS DistinctLocations " +
-                       " FROM meal m " +
-                       " JOIN meal_delivery md ON m.meal_id = md.meal_id " +
-                       " JOIN delivery d ON md.transaction_id = d.transaction_id " +
-                       " JOIN client c ON d.client_id = c.client_id " +
-                       " WHERE YEAR(d.order_date) = ? AND MONTH(d.order_date) = ? " +
-                       " GROUP BY m.meal_id, m.meal_name " +
-                       " ORDER BY TotalRevenue DESC";
+        String query = "SELECT m.meal_id, m.meal_name, " +
+                   "COUNT(d.transaction_id) AS TimesOrdered, " +
+                   "(COUNT(d.transaction_id) * m.price) AS TotalRevenue, " +
+                   "COUNT(DISTINCT c.location_id) AS DistinctLocations " +
+                   "FROM meal m " +
+                   "JOIN delivery d ON m.meal_id = d.meal_id " + 
+                   "JOIN client c ON d.client_id = c.client_id " +
+                   "WHERE YEAR(d.order_date) = ? AND MONTH(d.order_date) = ? " +
+                   "GROUP BY m.meal_id, m.meal_name, m.price " + 
+                   "ORDER BY TotalRevenue DESC";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) 
@@ -231,16 +231,16 @@ public class MealDAO {
 
     public List<MealPerformance> getMealPerformanceByYear(int year){
         List<MealPerformance> report = new ArrayList<>();
-        String query = "SELECT m.meal_id, m.meal_name, COUNT(md.transaction_id) AS TimesOrdered, " +
-                       " (COUNT(md.transaction_id) * m.price) AS TotalRevenue, " +
-                       " COUNT(DISTINCT c.location_id) AS DistinctLocations " +
-                       " FROM meal m " +
-                       " JOIN meal_delivery md ON m.meal_id = md.meal_id " +
-                       " JOIN delivery d ON md.transaction_id = d.transaction_id " +
-                       " JOIN client c ON d.client_id = c.client_id " +
-                       " WHERE YEAR(d.order_date) = ? "+
-                       " GROUP BY m.meal_id, m.meal_name " +
-                       " ORDER BY TotalRevenue DESC";
+        String query = "SELECT m.meal_id, m.meal_name, " +
+                   "COUNT(d.transaction_id) AS TimesOrdered, " +
+                   "(COUNT(d.transaction_id) * m.price) AS TotalRevenue, " +
+                   "COUNT(DISTINCT c.location_id) AS DistinctLocations " +
+                   "FROM meal m " +
+                   "JOIN delivery d ON m.meal_id = d.meal_id " + 
+                   "JOIN client c ON d.client_id = c.client_id " +
+                   "WHERE YEAR(d.order_date) = ? "+
+                   "GROUP BY m.meal_id, m.meal_name, m.price " + 
+                   "ORDER BY TotalRevenue DESC";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) 
         {
