@@ -54,7 +54,7 @@ public class DietPreferenceDAO {
     public List<DietPreference> getAllDietPreferences() {
         List<DietPreference> preferences = new ArrayList<>();
         // Query to select all data, ordered alphabetically for presentation
-        String query = "SELECT diet_preference_id, diet_name, description FROM diet_preference ORDER BY diet_name";
+        String query = "SELECT diet_preference_id, diet_name, description FROM diet_preference ORDER BY diet_preference_id";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
