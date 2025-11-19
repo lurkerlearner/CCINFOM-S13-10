@@ -28,8 +28,7 @@ public class MealPlanPanel extends JPanel
     private JTable availableMealsTable;
     private JTable currentMealsTable;
     private DefaultTableModel availableMealsModel;
-    // 🛠️ MODIFIED: Added remarks column
-    private DefaultTableModel currentMealsModel; 
+    private DefaultTableModel currentMealsModel;
     private JLabel manageMealsTitleLabel;
     private MealPlan currentPlanForManagement; // Holds the plan being edited
     // ---------------------------------------------------
@@ -47,7 +46,7 @@ public class MealPlanPanel extends JPanel
     private JButton refreshButton;
     private JButton detailsButton;
     private JButton deleteButton; 
-    private JButton manageMealsButton; 
+    private JButton manageMealsButton; // Renamed to editMealsButton in implementation
     
     // Components for searching Meal Plans
     private JComboBox<String> searchTypeComboBox;
@@ -76,12 +75,12 @@ public class MealPlanPanel extends JPanel
         createAddPanel();
         createViewPanel();
         createSearchPanel();
-        createManageMealsPanel(); 
+        createManageMealsPanel(); // <-- NEW: Create the fourth tab content
         
         tabbedPane.addTab("Add Meal Plan", addPanel);
         tabbedPane.addTab("View All / Modify", viewPanel);
         tabbedPane.addTab("Search", searchPanel);
-        tabbedPane.addTab("Manage Meals", manageMealsTab); 
+        tabbedPane.addTab("Manage Meals", manageMealsTab); // <-- NEW: Add the fourth tab
         
         // Initially disable the Manage Meals tab until a plan is selected
         tabbedPane.setEnabledAt(3, false); 
@@ -296,8 +295,6 @@ public class MealPlanPanel extends JPanel
 
         // --- Tables Initialization ---
         String[] mealColumns = {"ID", "Name", "Price"};
-        // 🛠️ MODIFIED: Added Remarks column for current meals table
-        String[] currentMealColumns = {"ID", "Name", "Price", "Remarks"};
         
         availableMealsModel = new DefaultTableModel(mealColumns, 0) {
             @Override
@@ -306,27 +303,19 @@ public class MealPlanPanel extends JPanel
         availableMealsTable = new JTable(availableMealsModel);
         availableMealsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
-        currentMealsModel = new DefaultTableModel(currentMealColumns, 0) { // 🛠️ USING NEW COLUMNS
-            // 🛠️ MODIFIED: Remarks column (index 3) is editable
+        currentMealsModel = new DefaultTableModel(mealColumns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) { return column == 3; } 
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         currentMealsTable = new JTable(currentMealsModel);
         currentMealsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
-        // 🛠️ NEW: Add listener to allow updating remarks directly in the table
-        currentMealsModel.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 3) {
-                updateMealRemarksFromTable(currentMealsModel, e.getFirstRow());
-            }
-        });
 
         // --- Button Panel (Center Controls) ---
         JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 5, 5));
         JButton addButton = new JButton("<< Add Meal");
         JButton removeButton = new JButton("Remove Meal >>");
 
-        addButton.addActionListener(e -> addMealToPlan()); // 🛠️ LOGIC UPDATED HERE
+        addButton.addActionListener(e -> addMealToPlan());
         removeButton.addActionListener(e -> removeMealFromPlan());
         
         buttonPanel.add(addButton);
@@ -409,51 +398,30 @@ public class MealPlanPanel extends JPanel
             String result = controller.updateMealPlan(id, newName, newDescription, cost);
             
             if (newName.trim().isEmpty()) {
-              JOptionPane.showMessageDialog(this, "Plan Name cannot be empty.",
-                       "Validation Error", JOptionPane.ERROR_MESSAGE);
-              refreshPlanTable(); 
-              return;
+             JOptionPane.showMessageDialog(this, "Plan Name cannot be empty.",
+                   "Validation Error", JOptionPane.ERROR_MESSAGE);
+             refreshPlanTable(); 
+             return;
             }
             if ("SUCCESS".equals(result)) {
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to update Plan ID " + id + ": " + result, "Database Error", JOptionPane.ERROR_MESSAGE);
                 
                 if (model == this.tableModel) {
-                      refreshPlanTable(); 
-                    } else {
-                      searchMealPlan(); 
-                    }
+                     refreshPlanTable(); 
+                   } else {
+                     searchMealPlan(); 
+                   }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Invalid data or update error: " + e.getMessage(),
                                          "Error", JOptionPane.ERROR_MESSAGE);
             
             if (model == this.tableModel) {
-                  refreshPlanTable(); 
-                } else {
-                  searchMealPlan(); 
-                } 
-        }
-    }
-
-    private void updateMealRemarksFromTable(DefaultTableModel model, int row) {
-        if (currentPlanForManagement == null) return;
-        
-        try {
-            int planId = currentPlanForManagement.getPlan_id();
-            int mealId = (int) model.getValueAt(row, 0);
-            String newRemarks = model.getValueAt(row, 3).toString();
-            
-            // ⚠️ Controller and DAO must have a method like updateMealPlanRemarks(planId, mealId, remarks)
-            if (controller.updateMealPlanRemarks(planId, mealId, newRemarks)) {
-                
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update remarks.", "Database Error", JOptionPane.ERROR_MESSAGE);
-                loadManageMealsTables(); // Reload to revert the change
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error updating remarks: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            loadManageMealsTables(); // Reload to revert the change
+                 refreshPlanTable(); 
+               } else {
+                 searchMealPlan(); 
+               } 
         }
     }
 
@@ -535,7 +503,6 @@ public class MealPlanPanel extends JPanel
         if (plan != null) {
             
             // 1. Fetch the meals for the selected plan using the Controller
-            // ⚠️ Assuming the Meal object returned here now includes the REMARKS field
             List<Meal> mealsInPlan = controller.getMealsForPlan(planID);
             
             // 2. Build the meal details string
@@ -546,7 +513,8 @@ public class MealPlanPanel extends JPanel
             } else {
                 for (Meal meal : mealsInPlan) {
                     // Formats the meal data neatly
-                    mealDetails.append(String.format(" - %s (ID: %d)\n Price: $%.2f | Calories: %d\n",
+                    mealDetails.append(String.format("  - %s (ID: %d)\n    Price: $%.2f | Calories: %d\n\n",
+                        meal.getMeal_name(), 
                         meal.getMeal_id(), 
                         meal.getPrice(), 
                         meal.getCalories()
@@ -572,7 +540,7 @@ public class MealPlanPanel extends JPanel
             JOptionPane.showMessageDialog(this, scrollPane, "Meal Plan Details (" + plan.getPlan_name() + ")", 
                                          JOptionPane.INFORMATION_MESSAGE);
         } else {
-              JOptionPane.showMessageDialog(this, "Failed to retrieve plan details.",
+             JOptionPane.showMessageDialog(this, "Failed to retrieve plan details.",
                                          "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -680,7 +648,7 @@ public class MealPlanPanel extends JPanel
             // 4. Switch to the new tab (index 3)
             tabbedPane.setSelectedIndex(3); 
         } else {
-              JOptionPane.showMessageDialog(this, "Failed to load plan details.",
+             JOptionPane.showMessageDialog(this, "Failed to load plan details.",
                                          "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -695,7 +663,6 @@ public class MealPlanPanel extends JPanel
 
         // Fetch data via Controller (Requires controller to have getAllMeals())
         List<Meal> allMeals = controller.getAllMeals(); 
-        // ⚠️ ASSUMING getMealsForPlan returns Meal objects that include the REMARKS field
         List<Meal> mealsInPlan = controller.getMealsForPlan(currentPlanForManagement.getPlan_id());
 
         // Get the IDs of meals currently in the plan for filtering
@@ -703,10 +670,9 @@ public class MealPlanPanel extends JPanel
             .map(Meal::getMeal_id)
             .collect(Collectors.toList());
 
-        // Populate the Current Meals Table (Now includes Remarks)
+        // Populate the Current Meals Table
         for (Meal meal : mealsInPlan) {
-            // 🛠️ MODIFIED: Added meal.getRemarks() to the row data
-            currentMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()}); 
+            currentMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()});
         }
 
         // Populate the Available Meals Table (Only meals NOT in the plan)
@@ -717,7 +683,7 @@ public class MealPlanPanel extends JPanel
         }
     }
     
-    // NEW METHOD: Handles adding a selected meal (Now prompts for remarks)
+    // NEW METHOD: Handles adding a selected meal
     private void addMealToPlan() {
         if (currentPlanForManagement == null) return;
         int selectedRow = availableMealsTable.getSelectedRow();
@@ -727,26 +693,11 @@ public class MealPlanPanel extends JPanel
         }
 
         int mealId = (int) availableMealsModel.getValueAt(selectedRow, 0);
-        String mealName = (String) availableMealsModel.getValueAt(selectedRow, 1);
-        
-        // 🛠️ NEW: Prompt user for remarks
-        String remarks = JOptionPane.showInputDialog(this, 
-            "Enter remarks for adding '" + mealName + "':", 
-            "Add Meal Remarks", JOptionPane.QUESTION_MESSAGE);
-            
-        // Handle Cancel or empty/null input gracefully
-        if (remarks == null) { 
-            return; // User cancelled
-        }
-        if (remarks.trim().isEmpty()) {
-            remarks = ""; // Store as empty string if user left it blank
-        }
 
-        // ⚠️ Requires controller to have addMealToPlan(mealId, planId, remarks)
-        if (controller.addMealtoPlan(mealId, currentPlanForManagement.getPlan_id(), remarks)) { 
+        // Requires controller to have addMealToPlan(mealId, planId)
+        if (controller.addMealtoPlan(mealId, currentPlanForManagement.getPlan_id())) {
             JOptionPane.showMessageDialog(this, "Meal added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             loadManageMealsTables(); // Reload tables to update the lists
-            refreshPlanTable(); // Also refresh the main table as total price might change
         } else {
             JOptionPane.showMessageDialog(this, "Failed to add meal. It might already be in the plan.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -767,7 +718,6 @@ public class MealPlanPanel extends JPanel
         if (controller.removeMealFromPlan(mealId, currentPlanForManagement.getPlan_id())) {
             JOptionPane.showMessageDialog(this, "Meal removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             loadManageMealsTables(); // Reload tables to update the lists
-            refreshPlanTable(); // Also refresh the main table as total price might change
         } else {
             JOptionPane.showMessageDialog(this, "Failed to remove meal.", "Error", JOptionPane.ERROR_MESSAGE);
         }
