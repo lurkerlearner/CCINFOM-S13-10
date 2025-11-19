@@ -79,6 +79,9 @@ public class FloodPandaWelcome extends JFrame {
         buttonPanel.add(Box.createVerticalStrut(20));
         buttonPanel.add(exit);
 
+        topPanel.setBackground(new Color(248,248,255));
+        buttonPanel.setBackground(new Color(248,248,255));
+
         content.add(topPanel);
         content.add(Box.createVerticalStrut(30));
         content.add(buttonPanel);

@@ -17,14 +17,37 @@ public class LoginScreen extends JFrame {
         setSize(600, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setOpaque(true);
+        wrapper.setBackground(new Color(248,248,255));
+        add(wrapper);
 
-        // --- TITLE ---
-        JLabel title = new JLabel("FloodPanda - Login", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 28));
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setOpaque(false);
+
+
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel(logoIcon);
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("FloodPanda");
+        title.setFont(new Font("Arial", Font.BOLD, 36));
         title.setForeground(new Color(220, 31, 127));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setOpaque(false);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topPanel.add(logoLabel);
+        topPanel.add(Box.createVerticalStrut(10));
+        topPanel.add(title);
+        topPanel.add(Box.createVerticalStrut(20));
 
         // --- FORM PANEL (CENTER) ---
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -67,7 +90,7 @@ public class LoginScreen extends JFrame {
         formPanel.add(showPassword, gbc);
 
         formPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(formPanel, BorderLayout.CENTER);
+
 
         // --- SOUTH PANEL (BUTTONS) ---
         JPanel southPanel = new JPanel();
@@ -80,9 +103,19 @@ public class LoginScreen extends JFrame {
         loginBtn.setPreferredSize(btnSize);
         exitBtn.setPreferredSize(btnSize);
 
+        formPanel.setBackground(new Color(248,248,255));
+        southPanel.setBackground(new Color(248,248,255));
+
         southPanel.add(loginBtn);
         southPanel.add(exitBtn);
-        add(southPanel, BorderLayout.SOUTH);
+
+        content.add(topPanel);
+        content.add(Box.createVerticalStrut(20));
+        content.add(formPanel);
+        content.add(Box.createVerticalStrut(20));
+        content.add(southPanel);
+        wrapper.add(content, new GridBagConstraints());
+
 
         // --- ACTION LISTENERS ---
 
