@@ -59,13 +59,21 @@ public class ClientMainMenu extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topPanel.setBackground(Color.WHITE);
 
-        //== APP NAME
-        JLabel logo = new JLabel("FloodPanda", SwingConstants.RIGHT);
-        logo.setFont(new Font("Arial", Font.BOLD, 24));
-        logo.setForeground(new Color(220, 31, 127));
-        topPanel.add(logo, BorderLayout.WEST);
+        //== APP NAME & LOGO
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel("FloodPanda", logoIcon, SwingConstants.LEFT);
+        logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        logoLabel.setForeground(new Color(220, 31, 127));
+        logoLabel.setIconTextGap(10);
+
+        topPanel.add(logoLabel, BorderLayout.WEST);
+
 
         add(topPanel, BorderLayout.NORTH);
+        getContentPane().setBackground(new Color(248,248,255));
 
         //==CENTER (BUTTONS)
         JPanel centerPanel = new JPanel();
@@ -92,6 +100,8 @@ public class ClientMainMenu extends JFrame {
         dateLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         dateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        centerPanel.setBackground(new Color(248,248,255));
+        centerPanel.setOpaque(true);
         centerPanel.add(welcomeLabel);
         centerPanel.add(Box.createVerticalStrut(20));
         centerPanel.add(locationLabel);
@@ -130,7 +140,6 @@ public class ClientMainMenu extends JFrame {
             centerPanel.add(Box.createVerticalStrut(15));
         }
 
-
         add(centerPanel, BorderLayout.CENTER);
 
         //==LOGOUT SOUTH PANEL
@@ -138,6 +147,8 @@ public class ClientMainMenu extends JFrame {
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 14));
         logoutBtn.setBackground(Color.LIGHT_GRAY);
+        southPanel.setBackground(new Color(248,248,255));
+        southPanel.setOpaque(true);
         southPanel.add(logoutBtn);
         add(southPanel, BorderLayout.SOUTH);
 
