@@ -363,8 +363,10 @@ public class FloodDataPanel extends JPanel
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton saveBtn = new JButton("Save Changes");
+        JButton deleteBtn = new JButton("Delete Flood Data");
 
         buttonPanel.add(saveBtn);
+        buttonPanel.add(deleteBtn);
 
         editPanel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
         editPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -474,6 +476,29 @@ public class FloodDataPanel extends JPanel
             }
         });
 
+        deleteBtn.addActionListener(e -> 
+        {
+            try 
+            {
+                FloodData selected = (FloodData) floodDropdown.getSelectedItem();
+                if (selected == null) 
+                {
+                    JOptionPane.showMessageDialog(this, "Please select a flood data record.");
+                    return;
+                }
+                else
+                {
+                    int key = selected.getFloodID();
+                    boolean dlt_ok = controller.deleteFloodData(key);
+                    if (dlt_ok)
+                        JOptionPane.showMessageDialog(this, "Flood data record deleted successfully!");
+                    refreshFloodTable();
+                }
+            } 
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error deleting flood data record! " + ex.getMessage());
+            }
+        });
     }
 
     private void addField(JPanel panel, GridBagConstraints gbc, int row, String label, JComponent field) {
