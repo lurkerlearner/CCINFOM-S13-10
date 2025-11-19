@@ -14,7 +14,7 @@ public class FloodPandaWelcome extends JFrame {
 
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setOpaque(true);
-        wrapper.setBackground(Color.WHITE);
+        wrapper.setBackground(new Color(248,248,255));
         add(wrapper);
 
         JPanel content = new JPanel();

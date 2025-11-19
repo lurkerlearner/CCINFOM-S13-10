@@ -16,16 +16,40 @@ public class RegisterScreen extends JFrame {
 
     public RegisterScreen() {
         setTitle("Create Account - FloodPanda");
-        setSize(600, 650);
+        setSize(800, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // ADD TITLE AT TOP
-        JLabel title = new JLabel("FloodPanda - Create Account", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 28));
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(new Color(248,248,255));
+        add(wrapper);
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content,BoxLayout.Y_AXIS));
+        content.setOpaque(false);
+
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel(logoIcon);
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("FloodPanda");
+        title.setFont(new Font("Arial", Font.BOLD, 36));
         title.setForeground(new Color(220, 31, 127));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setOpaque(false);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        topPanel.add(logoLabel);
+        topPanel.add(Box.createVerticalStrut(10));
+        topPanel.add(title);
+        topPanel.add(Box.createVerticalStrut(20));
+
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -95,10 +119,12 @@ public class RegisterScreen extends JFrame {
         gbc.gridx = 1;
         mainPanel.add(dietScroll, gbc);
 
-        add(mainPanel, BorderLayout.CENTER);
-
-
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.setOpaque(false);
+
+        mainPanel.setBackground(new Color(248,248,255));
+        mainPanel.setOpaque(true);
+
 
         JButton registerBtn = new JButton("Create Account");
         JButton exitBtn = new JButton("Exit");
@@ -106,7 +132,12 @@ public class RegisterScreen extends JFrame {
         buttonPanel.add(registerBtn);
         buttonPanel.add(exitBtn);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        content.add(topPanel);
+        content.add(mainPanel);
+        content.add(Box.createVerticalStrut(20));
+        content.add(buttonPanel);
+        wrapper.add(content, new GridBagConstraints());
+
 
         showPassword.addActionListener(e -> {
             if (showPassword.isSelected()) {

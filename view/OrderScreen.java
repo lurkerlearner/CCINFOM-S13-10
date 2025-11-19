@@ -37,7 +37,7 @@ public class OrderScreen extends JFrame
         this.lDAO = lDAO;
 
         setTitle("FloodPanda - Order Transaction");
-        setSize(800, 600);
+        setSize(800, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));

@@ -49,7 +49,7 @@ public class ClientMainMenu extends JFrame {
         this.dc = new DeliveryController(delDAO);
 
         setTitle("FloodPanda - Client Main Menu");
-        setSize(800, 600);
+        setSize(800, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));

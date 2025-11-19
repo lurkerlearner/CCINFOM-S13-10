@@ -28,7 +28,7 @@ public class ForgotPasswordScreen extends JFrame {
 
     public ForgotPasswordScreen(){
         setTitle("FloodPanda - Forgot Password");
-        setSize(800, 600);
+        setSize(800, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));

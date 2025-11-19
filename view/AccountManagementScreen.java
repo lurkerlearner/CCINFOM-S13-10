@@ -38,7 +38,7 @@ public class AccountManagementScreen extends JFrame {
         this.client = client;
 
         setTitle("FloodPanda - Account Management");
-        setSize(800, 600);
+        setSize(800, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
