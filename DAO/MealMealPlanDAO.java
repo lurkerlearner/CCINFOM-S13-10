@@ -57,6 +57,28 @@ public class MealMealPlanDAO {
             return false;
         }
     }
+    // DAO/MealMealPlanDAO.java (New Method for retrieving remarks)
+
+public String getRemarksForMealInPlan(int planId, int mealId) {
+    String remarks = "";
+    String query = "SELECT remarks FROM meal_meal_plan WHERE plan_id = ? AND meal_id = ?";
+    
+    try (Connection connection = DBConnection.getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        
+        preparedStatement.setInt(1, planId);
+        preparedStatement.setInt(2, mealId);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                remarks = resultSet.getString("remarks");
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error retrieving remarks: " + e.getMessage());
+    }
+    return remarks;
+}
 
 
     public List<Integer> getMealIdsByPlan(int planId) {

@@ -130,4 +130,26 @@ public class MealPlanController {
         }
         return mealMealPlanDAO.updateRemarks(planId, mealId, remarks); 
     }
+
+    public List<Object[]> getMealDetailsForManagement(int planId) {
+    List<Meal> meals = mealPlanDAO.getMealsInPlan(planId); 
+    
+
+    List<Object[]> mealDetails = new ArrayList<>();
+
+    for (Meal meal : meals) {
+
+        String remarks = mealMealPlanDAO.getRemarksForMealInPlan(planId, meal.getMeal_id());
+        
+       
+        Object[] row = new Object[] {
+            meal.getMeal_id(), 
+            meal.getMeal_name(), 
+            meal.getPrice(), 
+            remarks 
+        };
+        mealDetails.add(row);
+    }
+    return mealDetails;
+}
 }

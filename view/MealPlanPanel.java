@@ -684,44 +684,39 @@ public class MealPlanPanel extends JPanel
         }
     }
 
-    // Loads data into both Available and Current tables
+
     private void loadManageMealsTables() {
-        if (currentPlanForManagement == null) return;
-        
-        // Clear models
-        availableMealsModel.setRowCount(0);
-        currentMealsModel.setRowCount(0);
+    if (currentPlanForManagement == null) return;
+    
+    // Clear models
+    availableMealsModel.setRowCount(0);
+    currentMealsModel.setRowCount(0);
 
-        // Fetch data via Controller
-        List<Meal> allMeals = controller.getAllMeals(); 
-        List<Meal> mealsInPlan = controller.getMealsForPlan(currentPlanForManagement.getPlan_id());
+    int planId = currentPlanForManagement.getPlan_id();
+    
 
-        // Get the IDs of meals currently in the plan for filtering
-        List<Integer> currentMealIds = mealsInPlan.stream()
-            .map(Meal::getMeal_id)
-            .collect(Collectors.toList());
+    List<Meal> mealsInPlan = controller.getMealsForPlan(planId); 
 
-        // Populate the Current Meals Table
-        for (Meal meal : mealsInPlan) {
-            // Remarks column is included but is initialized to an empty string.
-            // If Meal POJO was updated (Step 3), this would use meal.getRemarks()
-            currentMealsModel.addRow(new Object[]{
-                meal.getMeal_id(), 
-                meal.getMeal_name(), 
-                meal.getPrice(), 
-                "" 
-            });
-        }
 
-        // Populate the Available Meals Table (Only meals NOT in the plan)
-        for (Meal meal : allMeals) {
-            if (!currentMealIds.contains(meal.getMeal_id())) {
-                availableMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()});
-            }
+    List<Integer> currentMealIds = mealsInPlan.stream()
+        .map(Meal::getMeal_id)
+        .collect(Collectors.toList());
+
+    List<Object[]> mealsInPlanDetails = controller.getMealDetailsForManagement(planId);
+
+    for (Object[] row : mealsInPlanDetails) {
+        currentMealsModel.addRow(row); 
+    }
+
+    List<Meal> allMeals = controller.getAllMeals(); 
+    for (Meal meal : allMeals) {
+        if (!currentMealIds.contains(meal.getMeal_id())) {
+            availableMealsModel.addRow(new Object[]{meal.getMeal_id(), meal.getMeal_name(), meal.getPrice()});
         }
     }
+}
     
-    // Handles adding a selected meal, passing the remarks
+
     private void addMealToPlan(String remarks) {
         if (currentPlanForManagement == null) return;
         int selectedRow = availableMealsTable.getSelectedRow();
