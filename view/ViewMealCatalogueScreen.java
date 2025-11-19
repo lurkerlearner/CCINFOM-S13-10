@@ -44,14 +44,17 @@ private JPanel mealDisplayPanel;
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
+
         createHeader();
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBackground(new Color(248,248,255));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         createSearchFilterPanel(contentPanel);
         createMealDisplay(contentPanel);
 
+        getContentPane().setBackground(new Color(248,248,255));
         add(contentPanel, BorderLayout.CENTER);
         loadAndDisplayMeals(controller.getAllMeals());
     }
@@ -62,11 +65,16 @@ private JPanel mealDisplayPanel;
         topPanel.setBackground(Color.WHITE);
 
         // Logo style matching AccountManagementScreen
-        JLabel logo = new JLabel("FloodPanda", SwingConstants.LEFT);
-        logo.setFont(new Font("Arial", Font.BOLD, 30));
-        logo.setForeground(new Color(220, 31, 127));
-        topPanel.add(logo, BorderLayout.WEST);
-        
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel("FloodPanda", logoIcon, SwingConstants.LEFT);
+        logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        logoLabel.setForeground(new Color(220, 31, 127));
+        logoLabel.setIconTextGap(10);
+
+        topPanel.add(logoLabel, BorderLayout.WEST);
 
         JButton backButton = new JButton("Back to Main");
         backButton.addActionListener(e -> {dispose();  
@@ -78,6 +86,7 @@ private JPanel mealDisplayPanel;
 
 private void createSearchFilterPanel(JPanel parentPanel){
     JPanel controlPanel = new JPanel();
+    controlPanel.setBackground(new Color(248,248,255));
     controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
     controlPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 30));
     controlPanel.setPreferredSize(new Dimension(250, 0));
@@ -86,6 +95,7 @@ private void createSearchFilterPanel(JPanel parentPanel){
     controlPanel.add(Box.createVerticalStrut(10));
 
     JPanel searchInputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,0,0));
+    searchInputPanel.setBackground(new Color(248,248,255));
     searchInputPanel.add(new JLabel("Search: "));
     searchField= new JTextField(15);
     searchInputPanel.add(searchField);
@@ -131,6 +141,7 @@ private void createSearchFilterPanel(JPanel parentPanel){
     private void createMealDisplay(JPanel parentPanel){
 
         mealDisplayPanel = new JPanel();
+        mealDisplayPanel.setBackground(new Color(248,248,255));
         mealDisplayPanel.setLayout(new GridLayout(0,2,20,20));
 
         JScrollPane scrollPane = new JScrollPane(mealDisplayPanel);

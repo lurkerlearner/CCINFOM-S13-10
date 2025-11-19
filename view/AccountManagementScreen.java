@@ -43,19 +43,26 @@ public class AccountManagementScreen extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-
+        getContentPane().setBackground(new Color(248,248,255));
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topPanel.setBackground(Color.WHITE);
 
-        JLabel logo = new JLabel("FloodPanda", SwingConstants.RIGHT);
-        logo.setFont(new Font("Arial", Font.BOLD, 24));
-        logo.setForeground(new Color(220, 31, 127));
-        topPanel.add(logo, BorderLayout.WEST);
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel("FloodPanda", logoIcon, SwingConstants.LEFT);
+        logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        logoLabel.setForeground(new Color(220, 31, 127));
+        logoLabel.setIconTextGap(10);
+
+        topPanel.add(logoLabel, BorderLayout.WEST);
         add(topPanel, BorderLayout.NORTH);
 
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setBackground(new Color(248,248,255));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 100, 30, 100));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -131,6 +138,7 @@ public class AccountManagementScreen extends JFrame {
 
 
         JPanel southPanel = new JPanel();
+        southPanel.setBackground(new Color(248,248,255));
         southPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
         editBtn = new JButton("Edit Profile");
@@ -221,6 +229,7 @@ public class AccountManagementScreen extends JFrame {
 
     private void setupDietPreferencesPanel() {
         dietPanel = new JPanel(new GridLayout(0, 1));
+        dietPanel.setBackground(new Color(248,248,255));
         dietPanel.setBorder(BorderFactory.createTitledBorder("Diet Preferences"));
 
         List<DietPreference> allPrefs = dietDAO.getAllDietPreferences();

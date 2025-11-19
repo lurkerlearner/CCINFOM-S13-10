@@ -42,34 +42,43 @@ public class OrderScreen extends JFrame
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        createHeader();
 
         JPanel centerPanel = new JPanel();
         createCenterPanel(centerPanel);
         JPanel buttonPanel = new JPanel();
         createButtonPanel(buttonPanel);
 
+        getContentPane().setBackground(new Color(248,248,255));
+        add(createHeader(), BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void createHeader()
+    private JPanel createHeader()
     {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topPanel.setBackground(Color.WHITE);
 
         // Logo style matching AccountManagementScreen
-        JLabel logo = new JLabel("FloodPanda", SwingConstants.LEFT);
-        logo.setFont(new Font("Arial", Font.BOLD, 30));
-        logo.setForeground(new Color(220, 31, 127));
-        topPanel.add(logo, BorderLayout.WEST);
-        add(topPanel, BorderLayout.NORTH);
+        ImageIcon logoIcon = new ImageIcon("resources/floodpanda.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(logoImg);
+
+        JLabel logoLabel = new JLabel("FloodPanda", logoIcon, SwingConstants.LEFT);
+        logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        logoLabel.setForeground(new Color(220, 31, 127));
+        logoLabel.setIconTextGap(10);
+
+        topPanel.add(logoLabel, BorderLayout.WEST);
+
+        return topPanel;
     }
 
     public void createCenterPanel(JPanel cp)
     {
-        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS)); 
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+        cp.setBackground(new Color(248,248,255));
 
         // add spacer on top
         cp.add(Box.createRigidArea(new Dimension(0, 50)));
@@ -159,6 +168,7 @@ public class OrderScreen extends JFrame
     public void createButtonPanel(JPanel bp)
     {
         bp.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20)); // Adjust spacing (Hgap, Vgap)
+        bp.setBackground(new Color(248,248,255));
 
         JButton backButton = new JButton("Back to Main Menu");
         Dimension backButtonSize = new Dimension(200, 27);
